@@ -1,0 +1,115 @@
+{% extends "pred/base_layout.html" %}
+
+{%block content_right_panel %}
+
+    {% if username %}
+      {% include "pred/user_header.html" %}
+    {% endif %}
+
+<h2>PRODRES: Protein Domain Reduced Search</h2>
+<p>Please paste your amino acid sequences in <a href='http://blast.ncbi.nlm.nih.gov/blastcgihelp.shtml' target=\'_blank\'>FASTA</a> format (max 100000 chars)<br>Allowed characters: "ABCDEFGHIKLMNPQRSTUVWYZX*", of which "BUZ*" will be converted to 'X'
+<br>
+(Sequences should be no shorter than 10 amino acids)
+</p>
+
+<form name="seq_form" action="/pred/" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+
+    Force run (do not use cached results): <input type="checkbox" name="forcerun">
+
+    <br><br>
+    <a href="#" onClick="javascript:hideShow('options');return false;" style="text-decoration:none; color:#333EF3"><b>Advanced options</b><img id="arrow" src='{{STATIC_URL}}images/arrow90.png' border=0>
+    </a>
+
+    <br>
+    <table cellspacing=1 cellpadding=0 border=0 id="options">
+        <tr><td colspan=2><img src='{{STATIC_URL}}images/0.gif' width=1 height=10></td></tr>
+
+        <tr><td colspan=2>
+                Keep temporary results (<font color="red">only for single-sequence jobs</font>): <input type="checkbox" name="keeptmpfile">
+        </td></tr>
+        <tr> </tr>
+        <tr> </tr>
+
+        <tr><td colspan=2><b>Options for PfamScan</b></td></tr>
+        <tr><td colspan=2><img src='{{STATIC_URL}}images/0.gif' width=1 height=5></td></tr>
+        <tr><td style="padding-left: 20px;">
+                Bit-score&nbsp;</td><td> <input type="number" name="pfamscan_bitscore" value="2" min="0" max="10000">
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                E-value&nbsp;</td><td> <input type="number" name="pfamscan_evalue" value="" min="0" max="10000">
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                Show overlapping hits within clan&nbsp;</td><td> <input type="checkbox" name="pfamscan_clanoverlap" checked>
+        </td></tr>
+
+
+        <tr><td colspan=2><img src='{{STATIC_URL}}images/0.gif' width=1 height=5></td></tr>
+        <tr><td colspan=2><b>Options for Jackhmmer</b></td></tr>
+        <tr><td colspan=2><img src='{{STATIC_URL}}images/0.gif' width=1 height=5></td></tr>
+        <tr><td style="padding-left: 20px;">
+                Threshold Type&nbsp;
+                </td><td> <input type="radio" name="jackhmmer_threshold_type" value="e-value" >E-value
+                &nbsp;
+                <input type="radio" name="jackhmmer_threshold_type" value="bit-score" checked>Bit-score
+                &nbsp;
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                E-value&nbsp;</td><td> <input type="number" step="any" name="jackhmmer_evalue" value="" min="0" max="10000">
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                Bit-score&nbsp;</td><td> <input type="number" step="any" name="jackhmmer_bitscore" value="25" min="0" max="10000">
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                Iteration&nbsp;</td><td> <input type="number" name="jackhmmer_iteration" value="3" min="0" max="10000">
+        </td></tr>
+
+        <tr><td colspan=2><img src='{{STATIC_URL}}images/0.gif' width=1 height=5></td></tr>
+        <tr><td colspan=2><b>Options for PSIBLAST</b></td></tr>
+        <tr><td colspan=2><img src='{{STATIC_URL}}images/0.gif' width=1 height=5></td></tr>
+        <tr><td style="padding-left: 20px;">
+                E-value&nbsp;</td><td> <input type="number" step="any" name="psiblast_evalue" value="0.1" min="0" max="10000">
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                Iteration&nbsp;</td><td> <input type="number" name="psiblast_iteration" value="3" min="0" max="100">
+        </td></tr>
+        <tr><td style="padding-left: 20px;">
+                <a title="alignment view options:
+0 = pairwise,
+1 = query-anchored showing identities,
+2 = query-anchored no identities,
+3 = flat query-anchored, show identities,
+4 = flat query-anchored, no identities,
+5 = XML Blast output,
+6 = tabular,
+7 = tabular with comment lines,
+8 = Text ASN.1,
+9 = Binary ASN.1
+10 = Comma-separated values
+11 = BLAST archive format (ASN.1)" href="https://www.ncbi.nlm.nih.gov/books/NBK279675/">Out format</a>&nbsp;</td><td> <input type="number" name="psiblast_outfmt" value="0" min="0" max="11">
+        </td></tr>
+
+        </table>
+
+        <script language="javascript">
+document.getElementById('options').style.display = 'none';
+        </script>
+        <br><br>
+        <p> <input type="submit" name=do value="Submit" /> <INPUT type="reset" value="Clear" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Generate example input" onclick="example_fill();"></p>
+
+</form>
+    <br><br><br>
+    <hr>
+   <table cellspacing=0 cellpadding=5 border=0>
+     <tr><td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=400></td>
+       <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=50></td>
+     </tr>
+     <tr><td> <h3>Reference</h3> </td></tr>
+         {% include "pred/refbib.html" %}
+     <tr><td> <h3>Resource provider</h3> </td></tr> 
+     <tr><td>PRODRES is supported by the <a href="https://www.egi.eu/services/cloud-compute/">EGI FedCloud</a> with the VO VO.NBIS.SE for computational resource. </td></tr> 
+     </td></tr>
+ </table>
+
+{% endblock %}

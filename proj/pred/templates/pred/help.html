@@ -1,0 +1,145 @@
+{% extends "pred/base_layout.html" %}
+
+{%block content_right_panel %}
+    {% if username %}
+      {% include "pred/user_header.html" %}
+    {% endif %}
+  <h2>Help</h2>
+  <table cellspacing=0 cellpadding=0 border=0>
+    <tr>
+      <td class="Greylink"><a href="#1">1.&nbsp;Summary<img src="{{STATIC_URL}}/images/0.gif" height=1 width=5 border=0><img src="{{STATIC_URL}}/images/arrow.png" border=0><img src="{{STATIC_URL}}/images/0.gif" height=1 width=40 border=0></a><td>
+      <td class="Greylink"><a href="#2">2.&nbsp;Usage<img src="{{STATIC_URL}}/images/0.gif" height=1 width=5 border=0><img src="{{STATIC_URL}}/images/arrow.png" border=0><img src="{{STATIC_URL}}/images/0.gif" height=1 width=40 border=0></a><td>
+      <td class="Greylink"><a href="#3">3.&nbsp;Output<img src="{{STATIC_URL}}/images/0.gif" height=1 width=5 border=0><img src="{{STATIC_URL}}/images/arrow.png" border=0><img src="{{STATIC_URL}}/images/0.gif" height=1 width=40 border=0></a><td>
+      <td class="Greylink"><a href="#4">4.&nbsp;References<img src="{{STATIC_URL}}/images/0.gif" height=1 width=5 border=0><img src="{{STATIC_URL}}/images/arrow.png" border=0><img src="{{STATIC_URL}}/images/0.gif" height=1 width=40 border=0></a><td>
+      <td class="Greylink"><a href="#5">5.&nbsp;Contact<img src="{{STATIC_URL}}/images/0.gif" height=1 width=5 border=0><img src="{{STATIC_URL}}/images/arrow.png" border=0><img src="{{STATIC_URL}}/images/0.gif" height=1 width=40 border=0></a><td>
+      </tr>
+  </table>
+
+  <table>
+    <tr>
+      <td valign="top" colspan="2">
+      <br><br>
+      <a name="1"></a>
+      <h3>1. Summary</h3><br>
+      <table cellspacing=0 cellpadding=0 border=0>
+        <tr>
+          <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=400></td>
+          <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=50></td>
+        </tr>
+        <tr> <td>
+            PRODRES is a fast way to obtain a Position-Specific Scoring
+            Matrix (PSSM) or a jackhmmer-generated profile Hidden Markov
+            Model (pHMM). By using the <a
+            href="http://pfam.xfam.org">PFAM</a> database as an
+            intermediate step, we can speed up the process of profile creation
+            by almost ten times if the query sequence has at least one hit in PFAM
+            domains, while, at the same time, obtaining virtually the same
+            profile as with a standard PSI-BLAST or jackhmmer search. If there
+            is no hit found PFAM domains, then a full searching in the Uniref90
+            database is performed.
+          </td>
+        </tr>
+      </table>
+
+      <br><br>
+
+      <a name="2"></a>
+      <h3>2. Usage</h3><br>
+      <table cellspacing=0 cellpadding=0 border=0>
+        <tr>
+          <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=400></td>
+          <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=50></td>
+        </tr>
+        <tr><td>
+            <p>
+            Input to the server is an amino acid sequence in <a
+              href='http://blast.ncbi.nlm.nih.gov/blastcgihelp.shtml'
+              target=\'_blank\'>FASTA</a> format. The users can submit your
+          query by either pasting one or several sequences in the text-area
+          provided, or, alternatively, uploading a file for batch submission of
+          sequences. PSSM profiles or HMMs (depending on your choices) for all
+          input sequences will be created.
+            </p>
+
+            <i>Example input:</i> <br>
+            <span style="font-family: courier">
+              &gt;sp|O93740|BACR_HALS4 Bacteriorhodopsin Halobacterium sp.<br>
+              MCCAALAPPMAATVGPESIWLWIGTIGMTLGTLYFVGRGRGVRDRKMQEFYIITIFITTI<br>
+              AAAMYFAMATGFGVTEVMVGDEALTIYWARYADWLFTTPLLLLDLSLLAGANRNTIATLI<br>
+              GLDVFMIGTGAIAALSSTPGTRIAWWAISTGALLALLYVLVGTLSENARNRAPEVASLFG<br>
+              RLRNLVIALWFLYPVVWILGTEGTFGILPLYWETAAFMVLDLSAKVGFGVILLQSRSVLE<br>
+              RVATPTAAPT<br>
+            </span>
+            <br>
+            <br>
+            Most common parameters for both PSI-BLAST and jackhmmer can be set
+            by the users accordingly in the <font color="#333EF3"><b>Advanced options</b></font> section
+
+      </td></tr>
+    </table>
+
+    <br><br>
+
+      <a name="3"></a>
+
+      <h3>3. Output</h3><br>
+      <table cellspacing=0 cellpadding=0 border=0>
+        <tr>
+          <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=400></td>
+          <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=50></td></tr>
+        <tr><td>
+                Based on the choices of the <b>Second search method</b>, a PSSM or a pHMM will be
+                returned. Further, the users can also obtain raw outputs and
+                intermediate files by checking <b>Keep temporary results</b> in
+                the <font color="#333EF3"><b>Advanced options</b></font>. All
+                files can be downloaded as a zip archive file for further analysis.
+      </td></tr>
+        <tr><td>
+                Furthermore, examples of results can be found <a href="/pred/example">here</a>
+      </td></tr>
+    </table>
+    <br><br>
+
+    <a name="4"></a>
+
+    <h3>4. References</h3><br>
+    <table cellspacing=0 cellpadding=0 border=0>
+      <tr><td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=400></td>
+        <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=50></td>
+      </tr>
+    {% include "pred/refbib.html" %}
+  </table>
+
+  <br><br>
+  <a name="5"></a>
+
+    <h3>5. Contact</h3><br
+    <table cellspacing=0 cellpadding=0 border=0>
+      <tr>
+        <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=400></td>
+        <td><img src="{{STATIC_URL}}/images/0.gif" border=0 height=1 width=50></td>
+      </tr>
+      <tr><td>
+          <b>Arne Elofsson group</b><br><br>
+          <!--<a href="http://www.cbr.su.se/">Center for Biomembrane Research</a><br><br>-->
+          <a href="http://www.dbb.su.se/">Department for Biochemistry and Biophysics</a><br>
+          The Arrhenius Laboratories for Natural Sciences<br>
+          <a href="http://www.su.se/">Stockholm University</a><br>
+          SE-106 91 Stockholm, Sweden<br><br>
+
+          <a href="http://www.scilifelab.se">Science for Life Laboratory</a><br>
+            Box 1031, 17121 Solna, Sweden
+            <br><br>
+          <table cellspacing=0 cellpadding=0 border=0>
+            <tr><td>E-mail:</td><td>&nbsp;&nbsp;&nbsp;</td><td><a href="mailto:arne@bioinfo.se">arne@bioinfo.se</a></td></tr>
+            <tr><td>Phone:</td><td>&nbsp;&nbsp;&nbsp;</td><td>(+46)-8-16&nbsp;4672</td></tr>
+            <tr><td>Fax:</td><td>&nbsp;&nbsp;&nbsp;</td><td>(+46)-8-15 3679</td></tr>
+          </table>
+          <br><br><br>
+    </td></tr>
+  </table>
+
+  </table>
+
+{% endblock %}
+

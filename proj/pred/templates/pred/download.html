@@ -1,0 +1,24 @@
+{% extends "pred/base_layout.html" %}
+
+{%block content_right_panel %}
+    {% if username %}
+      {% include "pred/user_header.html" %}
+    {% endif %}
+  <h2>Download</h2>
+  <br><br>
+  <table cellspacing=0 cellpadding=0 border=0>
+    <tr>
+      <td>
+
+    <tr>
+        <td>
+            <h3>1. PRODRES on the github:</h3>
+            <p style="margin-left:15px;">
+            <a href="https://github.com/ElofssonLab/PRODRES">https://github.com/ElofssonLab/PRODRES</a>
+            <br><br>
+            </p>
+        </td>
+    </tr>
+  </table>
+{% endblock %}
+
