@@ -72,6 +72,11 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para
     elif name_software in ['subcons']:
         runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq, "-verbose"]
+    elif name_software in ['docker_subcons']:
+        #runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
+        #cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq, "-verbose"]
+        containerID = 'subcons'
+        cmd =  ["/usr/bin/docker", "exec", "-it", containerID, "script", "/dev/null", "-c", "/home/software/subcons/master_subcons.sh /scratch/test/P04201.fasta /scratch/test/out1"]
     elif name_software in ['prodres']:
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
@@ -82,7 +87,10 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para
             os.environ['PERL5LIB'] = ""
         os.environ['PERL5LIB'] = os.environ['PERL5LIB'] + ":" + path_pfamscan
 
-        cmd = ["python", runscript, "--input", seqfile_this_seq, "--output", tmp_outpath_this_seq, "--pfam-dir", path_pfamdatabase, "--pfamscan-script", path_pfamscanscript, "--uniprot-db-fasta", blastdb, "--verbose"]
+        cmd = ["python", runscript, "--input", seqfile_this_seq, "--output",
+                tmp_outpath_this_seq, "--pfam-dir", path_pfamdatabase,
+                "--pfamscan-script", path_pfamscanscript, "--uniprot-db-fasta",
+                blastdb, "--verbose"]
 
         if 'second_method' in query_para and query_para['second_method'] != "":
             cmd += ['--second-search', query_para['second_method']]
@@ -191,7 +199,6 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
 
 
         cmd = GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para)
-
 
         cmdline = " ".join(cmd)
         g_params['runjob_log'].append(" ".join(cmd))
