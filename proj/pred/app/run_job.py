@@ -61,6 +61,28 @@ def PrintHelp(fpout=sys.stdout):#{{{
     print >> fpout, usage_ext
     print >> fpout, usage_exp#}}}
 
+def CleanResult(name_software, query_para, outpath_this_seq):#{{{
+    if name_software in ["prodres", "docker_prodres"]:
+        if not 'isKeepTempFile' in query_para or query_para['isKeepTempFile'] == False:
+            temp_result_folder = "%s/temp"%(outpath_this_seq)
+            if os.path.exists(temp_result_folder):
+                try:
+                    shutil.rmtree(temp_result_folder)
+                except:
+                    g_params['runjob_err'].append("Failed to delete the folder %s"%(temp_result_folder)+"\n")
+
+            flist = [
+                    "%s/outputs/%s"%(outpath_this_seq, "Alignment.txt"),
+                    "%s/outputs/%s"%(outpath_this_seq, "tableOut.txt"),
+                    "%s/outputs/%s"%(outpath_this_seq, "fullOut.txt")
+                    ]
+            for f in flist:
+                if os.path.exists(f):
+                    try:
+                        os.remove(f)
+                    except:
+                        g_params['runjob_err'].append("Failed to delete the file %s"%(f)+"\n")
+#}}}
 def GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para):#{{{
     """Return the command for subprocess
     """
@@ -233,24 +255,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
                 pass
 
 
-            if not 'isKeepTempFile' in query_para or query_para['isKeepTempFile'] == False:
-                try:
-                    temp_result_folder = "%s/temp"%(outpath_this_seq)
-                    shutil.rmtree(temp_result_folder)
-                except:
-                    g_params['runjob_err'].append("Failed to delete the folder %s"%(temp_result_folder)+"\n")
-
-                flist = [
-                        "%s/outputs/%s"%(outpath_this_seq, "Alignment.txt"),
-                        "%s/outputs/%s"%(outpath_this_seq, "tableOut.txt"),
-                        "%s/outputs/%s"%(outpath_this_seq, "fullOut.txt")
-                        ]
-                for f in flist:
-                    if os.path.exists(f):
-                        try:
-                            os.remove(f)
-                        except:
-                            g_params['runjob_err'].append("Failed to delete the file %s"%(f)+"\n")
+            CleanResult(name_software, query_para, outpath_this_seq)
 
             if isCmdSuccess:
                 runtime = runtime_in_sec #in seconds
