@@ -175,7 +175,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
 
     (seqIDList , seqAnnoList, seqList) = myfunc.ReadFasta(infile)
 
-    for ii in  xrange(len(seqIDList))
+    for ii in  xrange(len(seqIDList)):
         origIndex = ii
         seq = seqList[ii]
         description = seqAnnoList[ii]
