@@ -213,7 +213,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         end_time = time.time()
         runtime_in_sec = end_time - begin_time
 
-        aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq+os.sep+"query_0")
+        aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq+os.sep+"seq_0")
         if not os.path.exists(aaseqfile):
             seqcontent = ">%s\n%s\n"%(description, seq)
             myfunc.WriteFile(seqcontent, aaseqfile, "w")
@@ -221,7 +221,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
 
 
         if os.path.exists(tmp_outpath_this_seq):
-            cmd = ["mv","-f", tmp_outpath_this_seq+os.sep+"query_0", outpath_this_seq]
+            cmd = ["mv","-f", tmp_outpath_this_seq+os.sep+"seq_0", outpath_this_seq]
             isCmdSuccess = False
             try:
                 subprocess.check_output(cmd)
