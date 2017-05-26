@@ -6,6 +6,7 @@ import myfunc
 import subprocess
 import time
 import math
+import json
 suq_exec = "/usr/bin/suq"
 progname =  os.path.basename(__file__)
 wspace = ''.join([" "]*len(progname))
