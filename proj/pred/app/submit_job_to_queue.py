@@ -119,7 +119,7 @@ def SubmitSuqJob(suq_basedir, datapath, priority, scriptfile):#{{{
     myfunc.WriteFile("Entering SubmitSuqJob()\n", g_params['debugfile'], "a",
             True)
     rmsg = ""
-    cmd = [suq_exec,"-b", suq_basedir, "run", "-d", datapath, "-p", "%d"%(priority), scriptfile]
+    cmd = [suq_exec,"-b", suq_basedir, "run", "-d", outpath, "-p", "%d"%(priority), scriptfile]
     cmdline = " ".join(cmd)
     myfunc.WriteFile("cmdline: %s\n\n"%(cmdline), g_params['debugfile'], "a",
             True)
