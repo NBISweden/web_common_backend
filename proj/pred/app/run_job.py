@@ -283,34 +283,33 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
             g_params['runjob_err'].append(rt_msg)
 
 
-    if not g_params['isOnlyGetCache'] or len(toRunDict) == 0:
-        # now write the text output to a single file
-        statfile = "%s/%s"%(outpath_result, "stat.txt")
-        os.chdir(outpath)
-        cmd = ["zip", "-rq", zipfile, resultpathname]
-        try:
-            subprocess.check_output(cmd)
-        except subprocess.CalledProcessError, e:
-            g_params['runjob_err'].append(str(e))
-            pass
+    # now write the text output to a single file
+    statfile = "%s/%s"%(outpath_result, "stat.txt")
+    os.chdir(outpath)
+    cmd = ["zip", "-rq", zipfile, resultpathname]
+    try:
+        subprocess.check_output(cmd)
+    except subprocess.CalledProcessError, e:
+        g_params['runjob_err'].append(str(e))
+        pass
 
-        # write finish tag file
-        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-        if os.path.exists(finished_seq_file):
-            rt_msg = myfunc.WriteFile(datetime, finishtagfile)
-            if rt_msg:
-                g_params['runjob_err'].append(rt_msg)
+    # write finish tag file
+    datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+    if os.path.exists(finished_seq_file):
+        rt_msg = myfunc.WriteFile(datetime, finishtagfile)
+        if rt_msg:
+            g_params['runjob_err'].append(rt_msg)
 
+    isSuccess = False
+    if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
+        isSuccess = True
+    else:
         isSuccess = False
-        if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
-            isSuccess = True
-        else:
-            isSuccess = False
-            failtagfile = "%s/runjob.failed"%(outpath)
-            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-            rt_msg = myfunc.WriteFile(datetime, failtagfile)
-            if rt_msg:
-                g_params['runjob_err'].append(rt_msg)
+        failtagfile = "%s/runjob.failed"%(outpath)
+        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+        rt_msg = myfunc.WriteFile(datetime, failtagfile)
+        if rt_msg:
+            g_params['runjob_err'].append(rt_msg)
 
     if g_params['runjob_err'] == []:
         try:
