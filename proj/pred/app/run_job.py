@@ -39,7 +39,7 @@ usage_short="""
 Usage: %s seqfile_in_fasta 
        %s -jobid JOBID -outpath DIR -tmpdir DIR
        %s -email EMAIL -baseurl BASE_WWW_URL
-       %s -only-get-cache [-force]
+       %s -only-get-cache
 """%(progname, wspace, wspace, wspace)
 
 usage_ext="""\
@@ -47,10 +47,9 @@ Description:
     run job
 
 OPTIONS:
-  -force            Do not use cahced result
   -h, --help        Print this help message and exit
 
-Created 2016-12-01, 2017-04-19, Nanjiang Shu
+Created 2016-12-01, 2017-05-26, Nanjiang Shu
 """
 usage_exp="""
 Examples:

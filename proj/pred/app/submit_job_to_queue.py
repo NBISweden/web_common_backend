@@ -90,8 +90,6 @@ def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, 
         cmdline += "-email \"%s\" "%(email)
     if base_www_url != "":
         cmdline += "-baseurl \"%s\" "%(base_www_url)
-    if g_params['isForceRun']:
-        cmdline += "-force "
     if g_params['isOnlyGetCache']:
         cmdline += "-only-get-cache "
     code_str_list.append(cmdline)
