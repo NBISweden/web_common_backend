@@ -221,7 +221,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
 
 
         if os.path.exists(tmp_outpath_this_seq):
-            cmd = ["mv","-f", tmp_outpath_this_seq+os.sep+"seq_0", outpath_this_seq]
+            cmd = ["mv","-f", tmp_outpath_this_seq, outpath_this_seq]
             isCmdSuccess = False
             try:
                 subprocess.check_output(cmd)
