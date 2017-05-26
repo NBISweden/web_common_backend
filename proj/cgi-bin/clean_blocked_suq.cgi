@@ -14,7 +14,7 @@ my $progname = basename(__FILE__);
 my $logpath = "$basedir/pred/static/log";
 my $errfile = "$logpath/$progname.err";
 my $path_result = "$basedir/pred/static/result";
-my $auth_ip_file = "$basedir/config/auth_iplist.txt";#ip address which allows to run cgi script
+my $auth_ip_file = "$basedir/pred/config/auth_iplist.txt";#ip address which allows to run cgi script
 my $suq = "/usr/bin/suq";
 my $suqbase = "/scratch";
 

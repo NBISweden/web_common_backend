@@ -11,7 +11,7 @@ my $rundir = dirname(abs_path(__FILE__));
 my $suq = "/usr/bin/suq";
 # at proj
 my $basedir = abs_path("$rundir/../)";
-my $auth_ip_file = "$basedir/config/auth_iplist.txt";#ip address which allows to run cgi script
+my $auth_ip_file = "$basedir/pred/config/auth_iplist.txt";#ip address which allows to run cgi script
 
 print header();
 print start_html(-title => "delete an suq job",

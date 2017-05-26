@@ -2543,9 +2543,6 @@ class Service_submitseq(ServiceBase):
 
         numseq_str = "%d"%(seqinfo['numseq'])
         warninfo = seqinfo['warninfo']
-#         print "\n\nreq\n", dir(ctx.transport.req) #debug
-#         print "\n\n", ctx.transport.req.META['REMOTE_ADDR'] #debug
-#         print "\n\n", ctx.transport.req.META['HTTP_HOST']   #debug
         jobid = "None"
         url = "None"
         if filtered_seq == "":
