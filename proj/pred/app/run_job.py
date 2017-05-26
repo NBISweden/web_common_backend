@@ -241,6 +241,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         if len(cmd) < 1:
             datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             g_params['runjob_err'].append("[%s] empty cmd for name_software = %s"%(datetime, name_software))
+            pass
 
 
         cmdline = " ".join(cmd)
