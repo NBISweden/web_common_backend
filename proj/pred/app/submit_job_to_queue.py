@@ -82,7 +82,7 @@ def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, 
         numseq_this_user = numseq
 
     runjob = "%s %s/run_job.py"%(python_exec, rundir)
-    scriptfile = "%s/runjob,%s,%s,%s,%s,%d.sh"%(datapath, name_software, jobid, host_ip, email, numseq)
+    scriptfile = "%s/runjob,%s,%s,%s,%s,%d.sh"%(outpath, name_software, jobid, host_ip, email, numseq)
     code_str_list = []
     code_str_list.append("#!/bin/bash")
     cmdline = "%s %s -outpath %s -tmpdir %s -jobid %s "%(runjob, fafile, outpath, datapath, jobid)
