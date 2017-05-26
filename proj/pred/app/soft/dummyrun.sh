@@ -61,6 +61,6 @@ if [ ! -d "$OUTDIR/plot" ]; then
 fi
 
 
-exec_cmd "cat > $SEQFILE > $OUTDIR/query.result.txt"
+exec_cmd "cat $SEQFILE > $OUTDIR/query.result.txt"
 
 success5=1
