@@ -158,7 +158,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
     finishtagfile = "%s/runjob.finish"%(outpath)
     query_parafile = "%s/query.para.txt"%(outpath)
 
-    query_para = ""
+    query_para = {}
     content = myfunc.ReadFile(query_parafile)
     if content != "":
         query_para = json.loads(content)
@@ -182,10 +182,20 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
     finished_seq_file = "%s/finished_seqs.txt"%(outpath_result)
 
     for folder in [outpath_result, tmp_outpath_result]:
+        if os.path.exists(folder):
+            try:
+                shutil.rmtree(folder)
+            except:
+                datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+                msg = "[%s] Failed to delete folder %s"%(datetime, folder)
+                myfunc.WriteFile(msg+"\n", gen_errfile, "a")
+                return 1
+
         try:
             os.makedirs(folder)
         except OSError:
-            msg = "Failed to create folder %s"%(folder)
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            msg = "[%s] Failed to create folder %s"%(datetime, folder)
             myfunc.WriteFile(msg+"\n", gen_errfile, "a")
             return 1
 
@@ -249,7 +259,8 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
                 subprocess.check_output(cmd)
                 isCmdSuccess = True
             except subprocess.CalledProcessError, e:
-                msg =  "Failed to run prediction for sequence No. %d\n"%(origIndex)
+                datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+                msg =  "[%s] Failed to run prediction for sequence No. %d\n"%(datetime, origIndex)
                 g_params['runjob_err'].append(msg)
                 g_params['runjob_err'].append(str(e)+"\n")
                 pass
@@ -303,7 +314,8 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
     if os.path.exists(finished_seq_file):
         rt_msg = myfunc.WriteFile(datetime, finishtagfile)
         if rt_msg:
-            g_params['runjob_err'].append(rt_msg)
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
 
     isSuccess = False
     if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
@@ -314,14 +326,16 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         datetime = time.strftime("%Y-%m-%d %H:%M:%S")
         rt_msg = myfunc.WriteFile(datetime, failtagfile)
         if rt_msg:
-            g_params['runjob_err'].append(rt_msg)
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
 
     if g_params['runjob_err'] == []:
         try:
-            g_params['runjob_log'].append("shutil.rmtree(%s)"% (tmpdir))
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            g_params['runjob_log'].append("[%s] shutil.rmtree(%s)"% (datetime, tmpdir))
             shutil.rmtree(tmpdir)
         except:
-            g_params['runjob_err'].append("Failed to delete tmpdir %s"%(tmpdir))
+            g_params['runjob_err'].append("[%s] Failed to delete tmpdir %s"%(datetime, tmpdir))
     if len(g_params['runjob_err']) > 0:
         rt_msg = myfunc.WriteFile("\n".join(g_params['runjob_err'])+"\n", runjob_errfile, "w")
         return 1
