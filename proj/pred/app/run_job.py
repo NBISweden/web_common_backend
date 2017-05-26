@@ -157,6 +157,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
     app_logfile = "%s/app.log"%(outpath)
     finishtagfile = "%s/runjob.finish"%(outpath)
     query_parafile = "%s/query.para.txt"%(outpath)
+    failtagfile = "%s/runjob.failed"%(outpath)
 
     query_para = {}
     content = myfunc.ReadFile(query_parafile)
@@ -169,6 +170,10 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         name_software = query_para['name_software']
     except KeyError:
         name_software = ""
+        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+        rt_msg = myfunc.WriteFile(datetime, failtagfile)
+        if rt_msg:
+            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
 
 
     resultpathname = jobid
@@ -189,6 +194,9 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
                 datetime = time.strftime("%Y-%m-%d %H:%M:%S")
                 msg = "[%s] Failed to delete folder %s"%(datetime, folder)
                 myfunc.WriteFile(msg+"\n", gen_errfile, "a")
+                rt_msg = myfunc.WriteFile(datetime, failtagfile)
+                if rt_msg:
+                    g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
                 return 1
 
         try:
@@ -197,6 +205,9 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
             datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             msg = "[%s] Failed to create folder %s"%(datetime, folder)
             myfunc.WriteFile(msg+"\n", gen_errfile, "a")
+            rt_msg = myfunc.WriteFile(datetime, failtagfile)
+            if rt_msg:
+                g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
             return 1
 
     try:
@@ -322,11 +333,9 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         isSuccess = True
     else:
         isSuccess = False
-        failtagfile = "%s/runjob.failed"%(outpath)
         datetime = time.strftime("%Y-%m-%d %H:%M:%S")
         rt_msg = myfunc.WriteFile(datetime, failtagfile)
         if rt_msg:
-            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
 
     if g_params['runjob_err'] == []:
