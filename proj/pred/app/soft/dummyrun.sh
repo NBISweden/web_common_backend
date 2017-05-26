@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage="
-USAGE: $0 SEQFILE OUTDIR TMPDIR
+USAGE: $0 SEQFILE OUTDIR
 "
 
 VERBOSE=1
@@ -20,12 +20,10 @@ fi
 
 SEQFILE=$1
 OUTDIR=$2
-TMPDIR=$3
 
 
 SEQFILE=$(readlink -f $SEQFILE)
 OUTDIR=$(readlink -f $OUTDIR)
-TMPDIR=$(readlink -f $TMPDIR)
 
 
 RUNTOOL=$rundir/TOOLS
@@ -62,13 +60,7 @@ if [ ! -d "$OUTDIR/plot" ]; then
 	mkdir -p $OUTDIR/plot
 fi
 
-if [ ! -d "$TMPDIR" ]; then
-	mkdir -p $TMPDIR
-fi
 
 exec_cmd "cat > $SEQFILE > $OUTDIR/query.result.txt"
 
 success5=1
-exec_cmd "mv -rf $TMPDIR/"
-
-
