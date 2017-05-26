@@ -13,7 +13,7 @@ rundir=$(readlink -f $rundir)
 
 #cd $rundir
 
-if [ $# -lt 3 ];then
+if [ $# -lt 2 ];then
 	echo "$usage"
 	exit 1
 fi
