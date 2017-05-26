@@ -170,10 +170,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         name_software = query_para['name_software']
     except KeyError:
         name_software = ""
-        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-        rt_msg = myfunc.WriteFile(datetime, failtagfile)
-        if rt_msg:
-            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+
 
 
     resultpathname = jobid
@@ -241,6 +238,10 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
 
 
         cmd = GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para)
+        if len(cmd) < 1:
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            g_params['runjob_err'].append("[%s] empty cmd for name_software = %s"%(datetime, name_software))
+
 
         cmdline = " ".join(cmd)
         g_params['runjob_log'].append(" ".join(cmd))
