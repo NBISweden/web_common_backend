@@ -111,11 +111,11 @@ def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, 
     myfunc.WriteFile("priority=%d\n"%(priority), g_params['debugfile'], "a",
             True)
 
-    st1 = SubmitSuqJob(suq_basedir, datapath, priority, scriptfile)
+    st1 = SubmitSuqJob(suq_basedir, datapath, outpath, priority, scriptfile)
 
     return st1
 #}}}
-def SubmitSuqJob(suq_basedir, datapath, priority, scriptfile):#{{{
+def SubmitSuqJob(suq_basedir, datapath, outpath, priority, scriptfile):#{{{
     myfunc.WriteFile("Entering SubmitSuqJob()\n", g_params['debugfile'], "a",
             True)
     rmsg = ""
