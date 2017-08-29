@@ -97,6 +97,7 @@ from pred.models import FieldContainer
 from django.template import Context, loader
 
 def index(request):#{{{
+    logger = logging.getLogger(__name__)
     if not os.path.exists(path_result):
         os.mkdir(path_result, 0755)
     if not os.path.exists(path_result):
@@ -122,7 +123,7 @@ def index(request):#{{{
     if rootname_progname in config:
         g_params.update(config[rootname_progname])
         g_params['MAXSIZE_UPLOAD_FILE_IN_BYTE'] = g_params['MAXSIZE_UPLOAD_FILE_IN_MB'] * 1024*1024
-
+    logger.info("index visited")
     return submit_seq(request)
 #}}}
 def SetColorStatus(status):#{{{
@@ -2559,6 +2560,7 @@ class Service_submitseq(ServiceBase):
 # isforcerun is set as string, "true" or "false", case insensitive
     def submitjob_remote(ctx, seq="", para_str="", jobname="", email="",#{{{
             numseq_this_user="", isforcerun=""):
+        logger = logging.getLogger(__name__)
         seq = seq + "\n" #force add a new line for correct parsing the fasta file
         (filtered_seq, para_str, seqinfo) = ValidateSeq(seq, para_str)
         if numseq_this_user != "" and numseq_this_user.isdigit():
@@ -2584,6 +2586,7 @@ class Service_submitseq(ServiceBase):
                 if soap_req.isSecure():
                     url_scheme = "https://"
             except:
+                logger.debug("Failed to run soap_req.isSecure()")
                 pass
 
             try:
@@ -2634,6 +2637,7 @@ class Service_submitseq(ServiceBase):
 
     @rpc(Unicode, _returns=Iterable(Unicode))
     def checkjob(ctx, jobid=""):#{{{
+        logger = logging.getLogger(__name__)
         rstdir = "%s/%s"%(path_result, jobid)
         soap_req = ctx.transport.req
 
@@ -2642,6 +2646,7 @@ class Service_submitseq(ServiceBase):
             if soap_req.isSecure():
                 url_scheme = "https://"
         except:
+            logger.debug("Failed to run soap_req.isSecure()")
             pass
 
         hostname = soap_req.META['HTTP_HOST']

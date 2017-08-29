@@ -64,7 +64,7 @@ LOGGING = {
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.RotatingFileHandler',
             'filename': "%s/%s/%s/%s/debug.log"%(BASE_DIR,"pred", "static", "log"),
         },
     },

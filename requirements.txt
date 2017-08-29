@@ -3,6 +3,7 @@ misc/requests-2.12.3.tar.gz
 
 mod-wsgi
 
+pyyaml==3.12
 pysqlite==2.8.3
 lxml==3.6.0
 suds==0.4
