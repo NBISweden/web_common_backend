@@ -2583,10 +2583,10 @@ class Service_submitseq(ServiceBase):
 
             url_scheme = "http://"
             try:
-                if soap_req.isSecure():
+                if soap_req.is_secure():
                     url_scheme = "https://"
             except:
-                logger.debug("Failed to run soap_req.isSecure()")
+                logger.debug("Failed to run soap_req.is_secure()")
                 logger.debug("dir(soap_req):%s"%(str(dir(soap_req))))
                 pass
 
@@ -2644,10 +2644,10 @@ class Service_submitseq(ServiceBase):
 
         url_scheme = "http://"
         try:
-            if soap_req.isSecure():
+            if soap_req.is_secure():
                 url_scheme = "https://"
         except:
-            logger.debug("Failed to run soap_req.isSecure()")
+            logger.debug("Failed to run soap_req.is_secure()")
             logger.debug("dir(soap_req):%s"%(str(dir(soap_req))))
             pass
 
