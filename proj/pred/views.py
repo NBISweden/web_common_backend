@@ -2716,8 +2716,8 @@ class ExceptionHandlingService_submitseq(DjangoServiceBase):
 
 
 app_submitseq = Application([Service_submitseq, ContainerService_submitseq,
-    ExceptionHandlingService_submitseq], 'prodres.bioinfo.se',
-    in_url_scheme=Soap11(validator='soft'), out_url_scheme=Soap11())
+    ExceptionHandlingService_submitseq], 'commonbackend.bioinfo.se',
+    in_protocol=Soap11(validator='soft'), out_protocol=Soap11())
 #wsgi_app_submitseq = WsgiApplication(app_submitseq)
 
 submitseq_service = csrf_exempt(DjangoApplication(app_submitseq))
