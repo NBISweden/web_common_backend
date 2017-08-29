@@ -8,6 +8,7 @@ import time
 import math
 import shutil
 import json
+import logging
 
 
 os.environ['TZ'] = 'Europe/Stockholm'
@@ -26,7 +27,7 @@ from spyne.server.django import DjangoApplication
 from spyne.model.primitive import Unicode, Integer
 from spyne.model.complex import Iterable
 from spyne.service import ServiceBase
-from spyne.protocol.soap import Soap11
+from spyne.url_scheme.soap import Soap11
 from spyne.application import Application
 from spyne.decorator import rpc
 from spyne.util.django import DjangoComplexModel, DjangoServiceBase
@@ -102,9 +103,14 @@ def index(request):#{{{
         os.mkdir(path_tmp, 0755)
     if not os.path.exists(path_md5):
         os.mkdir(path_md5, 0755)
+
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
+
     base_www_url_file = "%s/static/log/base_www_url.txt"%(SITE_ROOT)
     if not os.path.exists(base_www_url_file):
-        base_www_url = "http://" + request.META['HTTP_HOST']
+        base_www_url = url_scheme + request.META['HTTP_HOST']
         myfunc.WriteFile(base_www_url, base_www_url_file, "w", True)
 
     configfile = "%s/config/config.json"%(SITE_ROOT)
@@ -167,6 +173,10 @@ def ReadFinishedJobLog(infile, status=""):#{{{
 #}}}
 def submit_seq(request):#{{{
     info = {}
+
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
 
     username = request.user.username
     client_ip = request.META['REMOTE_ADDR']
@@ -265,7 +275,8 @@ def submit_seq(request):#{{{
 
                 # start the qd_fe if not, in the background
 #                 cmd = [qd_fe_scriptfile]
-                base_www_url = "http://" + request.META['HTTP_HOST']
+
+                base_www_url = url_scheme + request.META['HTTP_HOST']
                 if webserver_common.IsFrontEndNode(base_www_url): #run the daemon only at the frontend
                     cmd = "nohup %s %s &"%(python_exec, qd_fe_scriptfile)
                     os.system(cmd)
@@ -783,6 +794,9 @@ def ValidateSeq(rawseq, para_str):#{{{
     return (filtered_seq, para_str, seqinfo)
 #}}}
 def RunQuery(request, query):#{{{
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
     errmsg = []
     tmpdir = tempfile.mkdtemp(prefix="%s/static/tmp/tmp_"%(SITE_ROOT))
     rstdir = tempfile.mkdtemp(prefix="%s/static/result/rst_"%(SITE_ROOT))
@@ -819,7 +833,7 @@ def RunQuery(request, query):#{{{
 
     errmsg.append(myfunc.WriteFile(json.dumps(query_para, sort_keys=True), query_parafile, "w"))
 
-    base_www_url = "http://" + request.META['HTTP_HOST']
+    base_www_url = url_scheme + request.META['HTTP_HOST']
     query['base_www_url'] = base_www_url
 
 
@@ -839,6 +853,9 @@ def RunQuery(request, query):#{{{
     return jobid
 #}}}
 def RunQuery_wsdl(rawseq, filtered_seq, seqinfo):#{{{
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
     errmsg = []
     tmpdir = tempfile.mkdtemp(prefix="%s/static/tmp/tmp_"%(SITE_ROOT))
     rstdir = tempfile.mkdtemp(prefix="%s/static/result/rst_"%(SITE_ROOT))
@@ -865,7 +882,7 @@ def RunQuery_wsdl(rawseq, filtered_seq, seqinfo):#{{{
     errmsg.append(myfunc.WriteFile(para_str, query_parafile, "w"))
     errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_t, "w"))
     errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_r, "w"))
-    base_www_url = "http://" + seqinfo['hostname']
+    base_www_url = url_scheme + seqinfo['hostname']
     seqinfo['base_www_url'] = base_www_url
 
     seqinfo['numseq_this_user'] = 1
@@ -876,6 +893,9 @@ def RunQuery_wsdl(rawseq, filtered_seq, seqinfo):#{{{
 #}}}
 def RunQuery_wsdl_local(rawseq, filtered_seq, seqinfo):#{{{
 # submit the wsdl job to the local queue
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
     errmsg = []
     tmpdir = tempfile.mkdtemp(prefix="%s/static/tmp/tmp_"%(SITE_ROOT))
     rstdir = tempfile.mkdtemp(prefix="%s/static/result/rst_"%(SITE_ROOT))
@@ -902,7 +922,7 @@ def RunQuery_wsdl_local(rawseq, filtered_seq, seqinfo):#{{{
     errmsg.append(myfunc.WriteFile(para_str, query_parafile, "w"))
     errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_t, "w"))
     errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_r, "w"))
-    base_www_url = "http://" + seqinfo['hostname']
+    base_www_url = url_scheme + seqinfo['hostname']
     seqinfo['base_www_url'] = base_www_url
 
     rtvalue = SubmitQueryToLocalQueue(seqinfo, tmpdir, rstdir, isOnlyGetCache=False)
@@ -2100,6 +2120,9 @@ def download(request):#{{{
 def get_results(request, jobid="1"):#{{{
     resultdict = {}
 
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
     username = request.user.username
     client_ip = request.META['REMOTE_ADDR']
     if username in settings.SUPER_USER_LIST:
@@ -2286,8 +2309,7 @@ def get_results(request, jobid="1"):#{{{
     resultdict['numseq'] = numseq
     resultdict['query_seqfile'] = os.path.basename(query_seqfile)
     resultdict['raw_query_seqfile'] = os.path.basename(raw_query_seqfile)
-    base_www_url = "http://" + request.META['HTTP_HOST']
-#   note that here one must add http:// in front of the url
+    base_www_url = url_scheme + request.META['HTTP_HOST']
     resultdict['url_result'] = "%s/pred/result/%s"%(base_www_url, jobid)
 
     sum_run_time = 0.0
@@ -2435,6 +2457,9 @@ def get_results(request, jobid="1"):#{{{
 def get_results_eachseq(request, jobid="1", seqindex="1"):#{{{
     resultdict = {}
 
+    url_scheme = "http://"
+    if request.is_secure():
+        url_scheme = "https://"
     resultdict['isAllNonTM'] = True
 
     username = request.user.username
@@ -2484,7 +2509,7 @@ def get_results_eachseq(request, jobid="1", seqindex="1"):#{{{
     resultdict['BASEURL'] =  g_params['BASEURL']
     resultdict['status'] = status
     resultdict['numseq'] = numseq
-    base_www_url = "http://" + request.META['HTTP_HOST']
+    base_www_url = url_scheme + request.META['HTTP_HOST']
 
     resultfile = "%s/%s/%s/%s"%(rstdir, outpathname, seqindex, "query.result.txt")
 
@@ -2554,6 +2579,13 @@ class Service_submitseq(ServiceBase):
             except:
                 client_ip = ""
 
+            url_scheme = "http://"
+            try:
+                if soap_req.isSecure():
+                    url_scheme = "https://"
+            except:
+                pass
+
             try:
                 hostname = soap_req.META['HTTP_HOST']
             except:
@@ -2589,7 +2621,7 @@ class Service_submitseq(ServiceBase):
                 if seqinfo['client_ip'] != "":
                     myfunc.WriteFile(log_record, divided_logfile_query, "a")
 
-                url = "http://" + hostname +   g_params['BASEURL'] + "result/%s"%(jobid)
+                url = url_scheme + hostname +   g_params['BASEURL'] + "result/%s"%(jobid)
 
                 file_seq_warning = "%s/%s/%s/%s"%(SITE_ROOT, "static/result", jobid, "query.warn.txt")
                 if seqinfo['warninfo'] != "":
@@ -2604,8 +2636,16 @@ class Service_submitseq(ServiceBase):
     def checkjob(ctx, jobid=""):#{{{
         rstdir = "%s/%s"%(path_result, jobid)
         soap_req = ctx.transport.req
+
+        url_scheme = "http://"
+        try:
+            if soap_req.isSecure():
+                url_scheme = "https://"
+        except:
+            pass
+
         hostname = soap_req.META['HTTP_HOST']
-        result_url = "http://" + hostname + "/static/" + "result/%s/%s.zip"%(jobid, jobid)
+        result_url = url_scheme + hostname + "/static/" + "result/%s/%s.zip"%(jobid, jobid)
         status = "None"
         url = ""
         errinfo = ""
@@ -2677,7 +2717,7 @@ class ExceptionHandlingService_submitseq(DjangoServiceBase):
 
 app_submitseq = Application([Service_submitseq, ContainerService_submitseq,
     ExceptionHandlingService_submitseq], 'prodres.bioinfo.se',
-    in_protocol=Soap11(validator='soft'), out_protocol=Soap11())
+    in_url_scheme=Soap11(validator='soft'), out_url_scheme=Soap11())
 #wsgi_app_submitseq = WsgiApplication(app_submitseq)
 
 submitseq_service = csrf_exempt(DjangoApplication(app_submitseq))
