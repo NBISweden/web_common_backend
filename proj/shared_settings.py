@@ -79,6 +79,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'proj.pred.views': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 logging.basicConfig(level=logging.DEBUG)
