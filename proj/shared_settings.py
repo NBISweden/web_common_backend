@@ -74,6 +74,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'root': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 logging.basicConfig(level=logging.DEBUG)

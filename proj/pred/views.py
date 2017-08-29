@@ -2587,6 +2587,7 @@ class Service_submitseq(ServiceBase):
                     url_scheme = "https://"
             except:
                 logger.debug("Failed to run soap_req.isSecure()")
+                logger.debug("dir(soap_req):%s"%(str(dir(soap_req))))
                 pass
 
             try:
