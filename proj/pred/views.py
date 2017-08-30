@@ -853,50 +853,8 @@ def RunQuery(request, query):#{{{
         myfunc.WriteFile("", forceruntagfile)
     return jobid
 #}}}
-def RunQuery_wsdl(rawseq, filtered_seq, seqinfo):#{{{
-    url_scheme = "http://"
-    if request.is_secure():
-        url_scheme = "https://"
-    errmsg = []
-    tmpdir = tempfile.mkdtemp(prefix="%s/static/tmp/tmp_"%(SITE_ROOT))
-    rstdir = tempfile.mkdtemp(prefix="%s/static/result/rst_"%(SITE_ROOT))
-    os.chmod(tmpdir, 0755)
-    os.chmod(rstdir, 0755)
-    jobid = os.path.basename(rstdir)
-    seqinfo['jobid'] = jobid
-    numseq = seqinfo['numseq']
-    para_str = seqinfo['para_str']
-
-# write files for the query
-    jobinfofile = "%s/jobinfo"%(rstdir)
-    rawseqfile = "%s/query.raw.fa"%(rstdir)
-    seqfile_t = "%s/query.fa"%(tmpdir)
-    seqfile_r = "%s/query.fa"%(rstdir)
-    query_parafile = "%s/query.para.txt"%(rstdir)
-    warnfile = "%s/warn.txt"%(tmpdir)
-    jobinfo_str = "%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\n"%(seqinfo['date'], jobid,
-            seqinfo['client_ip'], seqinfo['numseq'],
-            len(rawseq),seqinfo['jobname'], seqinfo['email'],
-            seqinfo['method_submission'])
-    errmsg.append(myfunc.WriteFile(jobinfo_str, jobinfofile, "w"))
-    errmsg.append(myfunc.WriteFile(rawseq, rawseqfile, "w"))
-    errmsg.append(myfunc.WriteFile(para_str, query_parafile, "w"))
-    errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_t, "w"))
-    errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_r, "w"))
-    base_www_url = url_scheme + seqinfo['hostname']
-    seqinfo['base_www_url'] = base_www_url
-
-    seqinfo['numseq_this_user'] = 1
-    SubmitQueryToLocalQueue(seqinfo, tmpdir, rstdir, isOnlyGetCache=True)
-
-    # changed 2015-03-26, any jobs submitted via wsdl is hadndel
-    return jobid
-#}}}
 def RunQuery_wsdl_local(rawseq, filtered_seq, seqinfo):#{{{
 # submit the wsdl job to the local queue
-    url_scheme = "http://"
-    if request.is_secure():
-        url_scheme = "https://"
     errmsg = []
     tmpdir = tempfile.mkdtemp(prefix="%s/static/tmp/tmp_"%(SITE_ROOT))
     rstdir = tempfile.mkdtemp(prefix="%s/static/result/rst_"%(SITE_ROOT))
@@ -923,7 +881,7 @@ def RunQuery_wsdl_local(rawseq, filtered_seq, seqinfo):#{{{
     errmsg.append(myfunc.WriteFile(para_str, query_parafile, "w"))
     errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_t, "w"))
     errmsg.append(myfunc.WriteFile(filtered_seq, seqfile_r, "w"))
-    base_www_url = url_scheme + seqinfo['hostname']
+    base_www_url = seqinfo['url_scheme'] + seqinfo['hostname']
     seqinfo['base_www_url'] = base_www_url
 
     rtvalue = SubmitQueryToLocalQueue(seqinfo, tmpdir, rstdir, isOnlyGetCache=False)
@@ -2603,6 +2561,7 @@ class Service_submitseq(ServiceBase):
             seqinfo['client_ip'] = client_ip
             seqinfo['hostname'] = hostname
             seqinfo['method_submission'] = "wsdl"
+            seqinfo['url_scheme'] = url_scheme
             # for this method, wsdl is called only by the daemon script, isForceRun can be
             # set by the argument
             if isforcerun.upper()[:1] == "T":
