@@ -111,7 +111,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para
         cmd = ["python", runscript, "--input", seqfile_this_seq, "--output",
                 tmp_outpath_this_seq, "--pfam-dir", path_pfamdatabase,
                 "--pfamscan-script", path_pfamscanscript, "--fallback-db-fasta",
-                blastdb, "--verbose"]
+                blastdb]
 
         if 'second_method' in query_para and query_para['second_method'] != "":
             cmd += ['--second-search', query_para['second_method']]
