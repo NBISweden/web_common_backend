@@ -105,7 +105,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         #runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         #cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq, "-verbose"]
         containerID = 'subcons'
-        cmd =  ["/usr/bin/docker", "exec", "-it", containerID, "script", "/dev/null", "-c", "cd %s; /home/app/subcons/master_subcons.sh %s %s"%(docker_tmp_outpath_result, docker_seqfile_this_seq, docker_tmp_outpath_this_seq)]
+        cmd =  ["/usr/bin/docker", "exec", containerID, "script", "/dev/null", "-c", "cd %s; /home/app/subcons/master_subcons.sh %s %s"%(docker_tmp_outpath_result, docker_seqfile_this_seq, docker_tmp_outpath_this_seq)]
     elif name_software in ['prodres']:
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
