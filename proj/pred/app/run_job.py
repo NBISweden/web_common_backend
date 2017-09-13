@@ -83,9 +83,17 @@ def CleanResult(name_software, query_para, outpath_this_seq):#{{{
                     except:
                         g_params['runjob_err'].append("Failed to delete the file %s"%(f)+"\n")
 #}}}
-def GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para):#{{{
+def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para):#{{{
     """Return the command for subprocess
     """
+
+    try:
+        docker_tmp_outpath_result = os.sep + os.sep.join(tmp_outpath_result.split(os.sep)[tmp_outpath_result.split(os.sep).index("static"):])
+        docker_seqfile_this_seq = os.sep + os.sep.join(seqfile_this_seq.split(os.sep)[seqfile_this_seq.split(os.sep).index("static"):])
+        docker_tmp_outpath_this_seq = os.sep + os.sep.join(tmp_outpath_this_seq.split(os.sep)[tmp_outpath_this_seq.split(os.sep).index("static"):])
+    except:
+        raise
+
     cmd = []
     if name_software in ['dummy']:
         runscript = "%s/%s"%(rundir, "soft/dummyrun.sh")
@@ -97,7 +105,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para
         #runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         #cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq, "-verbose"]
         containerID = 'subcons'
-        cmd =  ["/usr/bin/docker", "exec", "-it", containerID, "script", "/dev/null", "-c", "/home/software/subcons/master_subcons.sh /scratch/test/P04201.fasta /scratch/test/out1"]
+        cmd =  ["/usr/bin/docker", "exec", "-it", containerID, "script", "/dev/null", "-c", "cd %s; /home/app/subcons/master_subcons.sh %s %s"%(docker_tmp_outpath_result, docker_seqfile_this_seq, docker_tmp_outpath_this_seq)]
     elif name_software in ['prodres']:
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
@@ -237,7 +245,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
             continue
 
 
-        cmd = GetCommand(name_software, seqfile_this_seq, tmp_outpath_this_seq, query_para)
+        cmd = GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para)
         if len(cmd) < 1:
             datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             g_params['runjob_err'].append("[%s] empty cmd for name_software = %s"%(datetime, name_software))
