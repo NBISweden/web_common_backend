@@ -670,17 +670,18 @@ def ValidateSeq(rawseq, para_str):#{{{
 
     query_para = json.loads(para_str)
     #validating parameters
-    if query_para['pfamscan_evalue'] != "" and query_para['pfamscan_bitscore'] != "":
-        seqinfo['errinfo'] += "Parameter setting error!"
-        seqinfo['errinfo'] = "Both PfamScan E-value and PfamScan Bit-score "\
-                "are set! One and only one of them should be set!"
-        return False
+    if 'name_software' in query_para and query_para['name_software'] in ["prodres", "docker_prodres"]:
+        if query_para['pfamscan_evalue'] != "" and query_para['pfamscan_bitscore'] != "":
+            seqinfo['errinfo'] += "Parameter setting error!"
+            seqinfo['errinfo'] = "Both PfamScan E-value and PfamScan Bit-score "\
+                    "are set! One and only one of them should be set!"
+            return False
 
-    if query_para['jackhmmer_bitscore'] != "" and query_para['jackhmmer_evalue'] != "":
-        seqinfo['errinfo'] += "Parameter setting error!"
-        seqinfo['errinfo'] = "Both Jackhmmer E-value and Jackhmmer Bit-score "\
-                "are set! One and only one of them should be set!"
-        return False
+        if query_para['jackhmmer_bitscore'] != "" and query_para['jackhmmer_evalue'] != "":
+            seqinfo['errinfo'] += "Parameter setting error!"
+            seqinfo['errinfo'] = "Both Jackhmmer E-value and Jackhmmer Bit-score "\
+                    "are set! One and only one of them should be set!"
+            return False
 
 
 # filter empty sequences and any sequeces shorter than 10 amino acids
