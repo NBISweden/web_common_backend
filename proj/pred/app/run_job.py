@@ -266,7 +266,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         end_time = time.time()
         runtime_in_sec = end_time - begin_time
 
-        aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq+os.sep+"seq_0")
+        aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq)
         if not os.path.exists(aaseqfile):
             seqcontent = ">%s\n%s\n"%(description, seq)
             myfunc.WriteFile(seqcontent, aaseqfile, "w")
@@ -310,6 +310,10 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
 
                 info_this_seq = "%s\t%d\t%s\t%s"%("seq_%d"%origIndex, len(seq), description, seq)
                 resultfile_text_this_seq = "%s/%s"%(outpath_this_seq, "query.result.txt")
+                webserver_common.WriteTextResultFile(name_software, resultfile_text_this_seq,
+                        outpath_result,
+                        [info_this_seq], runtime_in_sec,
+                        g_params['base_www_url'])
 
     all_end_time = time.time()
     all_runtime_in_sec = all_end_time - all_begin_time

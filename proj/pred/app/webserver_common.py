@@ -69,6 +69,12 @@ def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
     except IOError:
         print "Failed to write to file %s"%(outfile)
 #}}}
+def WriteTextResultFile(name_software, outfile, outpath_result, maplist,#{{{
+        runtime_in_sec, base_www_url, statfile=""):
+    if name_software in ["subcons", "docker_subcons"]:
+        WriteSubconsTextResultFile(outfile, outpath_result, maplist,
+                runtime_in_sec, base_www_url, statfile)
+#}}}
 
 def GetLocDef(predfile):#{{{
     """
