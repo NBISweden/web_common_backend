@@ -98,15 +98,36 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
     if name_software in ['dummy']:
         runscript = "%s/%s"%(rundir, "soft/dummyrun.sh")
         cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq]
+    elif name_software in ['scampi2-single']:
+        if not os.path.exists(tmp_outpath_this_seq):
+            os.makedirs(tmp_outpath_this_seq)
+        runscript = "%s/%s"%(rundir, "soft/scampi2/bin/scampi/SCAMPI_run.pl")
+        outtopfile = "%s/query.top"%(tmp_outpath_this_seq)
+        cmd = [runscript, seqfile_this_seq,  outtopfile]
+    elif name_software in ['scampi2-msa']:
+        if not os.path.exists(tmp_outpath_this_seq):
+            os.makedirs(tmp_outpath_this_seq)
+        runscript = "%s/%s"%(rundir, 
+                "soft/scampi2/bin/scampi-msa/run_SCAMPI_multi.pl")
+        outtopfile = "%s/query.top"%(tmp_outpath_this_seq)
+        blastdir = "%s/%s"%(rundir, "soft/blast/blast-2.2.26")
+        os.environ['BLASTMAT'] = "%s/data"%(blastdir)
+        os.environ['BLASTBIN'] = "%s/bin"%(blastdir)
+        os.environ['BLASTDB'] = "%s/%s"%(rundir, "soft/blastdb")
+        blastdb = "%s/%s"%(os.environ['BLASTDB'], "uniref90.fasta" )
+        cmd = [runscript, seqfile_this_seq, outtopfile, blastdir, blastdb]
     elif name_software in ['subcons']:
         runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
-        cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq, "-verbose"]
+        cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq,
+                "-verbose"]
     elif name_software in ['docker_subcons']:
-        #runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
-        #cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq, "-verbose"]
         containerID = 'subcons'
-        cmd =  ["/usr/bin/docker", "exec", containerID, "script", "/dev/null", "-c", "cd %s; /home/app/subcons/master_subcons.sh %s %s"%(docker_tmp_outpath_result, docker_seqfile_this_seq, docker_tmp_outpath_this_seq)]
-    elif name_software in ['prodres']:
+        cmd =  ["/usr/bin/docker", "exec", containerID, 
+                "script", "/dev/null", "-c", 
+                "cd %s; /home/app/subcons/master_subcons.sh %s %s"%(
+                    docker_tmp_outpath_result, docker_seqfile_this_seq,
+                    docker_tmp_outpath_this_seq)]
+    elif name_software in ['prodres']:#{{{
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
         path_pfamdatabase = "%s/soft/PRODRES/databases"%(rundir)
@@ -126,7 +147,8 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
 
         if 'pfamscan_evalue' in query_para and query_para['pfamscan_evalue'] != "":
             cmd += ['--pfamscan_e-val', query_para['pfamscan_evalue']]
-        elif 'pfamscan_bitscore' in query_para and query_para['pfamscan_bitscore'] != "":
+        elif ('pfamscan_bitscore' in query_para and
+                query_para['pfamscan_bitscore'] != ""):
             cmd += ['--pfamscan_bitscore', query_para['pfamscan_bitscore']]
 
         if 'pfamscan_clanoverlap' in query_para:
@@ -135,22 +157,27 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
             else:
                 cmd += ['--pfamscan_clan-overlap', 'yes']
 
-        if 'jackhmmer_iteration' in query_para and query_para['jackhmmer_iteration'] != "":
+        if ('jackhmmer_iteration' in query_para and
+                query_para['jackhmmer_iteration'] != ""):
             cmd += ['--jackhmmer_max_iter', query_para['jackhmmer_iteration']]
 
-        if 'jackhmmer_threshold_type' in query_para and query_para['jackhmmer_threshold_type'] != "":
-            cmd += ['--jackhmmer-threshold-type', query_para['jackhmmer_threshold_type']]
+        if ('jackhmmer_threshold_type' in query_para and
+                query_para['jackhmmer_threshold_type'] != ""):
+            cmd += ['--jackhmmer-threshold-type',
+                    query_para['jackhmmer_threshold_type']]
 
         if 'jackhmmer_evalue' in query_para and query_para['jackhmmer_evalue'] != "":
             cmd += ['--jackhmmer_e-val', query_para['jackhmmer_evalue']]
-        elif 'jackhmmer_bitscore' in query_para and query_para['jackhmmer_bitscore'] != "":
+        elif ('jackhmmer_bitscore' in query_para and
+                query_para['jackhmmer_bitscore'] != ""):
             cmd += ['--jackhmmer_bit-score', query_para['jackhmmer_bitscore']]
 
-        if 'psiblast_iteration' in query_para and query_para['psiblast_iteration'] != "":
+        if ('psiblast_iteration' in query_para and
+                query_para['psiblast_iteration'] != ""):
             cmd += ['--psiblast_iter', query_para['psiblast_iteration']]
         if 'psiblast_outfmt' in query_para and query_para['psiblast_outfmt'] != "":
             cmd += ['--psiblast_outfmt', query_para['psiblast_outfmt']]
-
+#}}}
 
     return cmd
 
@@ -225,6 +252,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
     for ii in  xrange(len(seqIDList)):
         origIndex = ii
         seq = seqList[ii]
+        seqid = seqIDList[ii]
         description = seqAnnoList[ii]
 
         subfoldername_this_seq = "seq_%d"%(origIndex)
@@ -270,7 +298,9 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
         if not os.path.exists(aaseqfile):
             seqcontent = ">%s\n%s\n"%(description, seq)
             myfunc.WriteFile(seqcontent, aaseqfile, "w")
-
+        timefile = "%s/time.txt"%(tmp_outpath_this_seq)
+        if not os.path.exists(timefile):
+            myfunc.WriteFile("%s;%f\n"%(seqid,runtime_in_sec), timefile, "w")
 
 
         if os.path.exists(tmp_outpath_this_seq):
