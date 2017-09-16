@@ -9,6 +9,7 @@
 # then install programs in the virtual environment
 mkdir -p ~/.virtualenvs
 rundir=`dirname $0`
+rundir=`readlink -f $rundir`
 cd $rundir
 exec_virtualenv=virtualenv
 if [ -f "/usr/local/bin/virtualenv" ];then
