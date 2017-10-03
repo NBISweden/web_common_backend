@@ -136,6 +136,22 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                 "cd %s; /home/app/subcons/master_subcons.sh %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
                     docker_tmp_outpath_this_seq)]
+    elif name_software in ['docker_proq3']:
+        containerID = 'proq3'
+        if 'isOnlyBuildProfile' in query_para:
+            cmd =  ["/usr/bin/docker", "exec", containerID, 
+                "script", "/dev/null", "-c", 
+                "cd %s; /home/app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
+                    docker_tmp_outpath_result, docker_seqfile_this_seq,
+                    docker_tmp_outpath_this_seq)]
+        elif 'profile' in query_para:
+            ExtractProQ3Profile(query_para['profile'], tmp_outpath_result)
+            docker_path_profile = "%s/profile"%(docker_tmp_outpath_result)
+            cmd =  ["/usr/bin/docker", "exec", containerID, 
+                "script", "/dev/null", "-c", 
+                "cd %s; /home/app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose"%(
+                    docker_path_profile, docker_seqfile_this_seq, docker_tmp_outpath_result,
+                    docker_tmp_outpath_this_seq)]
     elif name_software in ['prodres']:#{{{
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
