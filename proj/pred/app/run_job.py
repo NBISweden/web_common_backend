@@ -116,6 +116,15 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         os.environ['BLASTDB'] = "%s/%s"%(rundir, "soft/blastdb")
         blastdb = "%s/%s"%(os.environ['BLASTDB'], "uniref90.fasta" )
         cmd = [runscript, seqfile_this_seq, outtopfile, blastdir, blastdb]
+    elif name_software in ['topcons2']:
+        runscript = "%s/%s"%(rundir, 
+                "soft/topcons2_webserver/workflow/pfam_workflow.py")
+        blastdir = "%s/%s"%(rundir, "soft/blast/blast-2.2.26")
+        os.environ['BLASTMAT'] = "%s/data"%(blastdir)
+        os.environ['BLASTBIN'] = "%s/bin"%(blastdir)
+        os.environ['BLASTDB'] = "%s/%s"%(rundir, "soft/blastdb")
+        blastdb = "%s/%s"%(os.environ['BLASTDB'], "uniref90.fasta" )
+        cmd = ["python", runscript, seqfile_this_seq,  tmp_outpath_result, blastdir, blastdb]
     elif name_software in ['subcons']:
         runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq,
