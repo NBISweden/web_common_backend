@@ -544,7 +544,8 @@ def ValidateQuery(request, query):#{{{
         query['rawseq'] = content
 
     seqRecordList = []
-    myfunc.ReadFastaFromBuffer(query['rawseq'], seqRecordList, True, 0, 0)
+    rawseq = re.sub(r'[^\x00-\x7f]',r' ',query['rawseq']) # remove non-ASCII characters
+    myfunc.ReadFastaFromBuffer(rawseq, seqRecordList, True, 0, 0)
 # filter empty sequences and any sequeces shorter than MIN_LEN_SEQ or longer
 # than MAX_LEN_SEQ
     newSeqRecordList = []
@@ -661,6 +662,7 @@ def ValidateQuery(request, query):#{{{
 def ValidateSeq(rawseq, para_str):#{{{
 # seq is the chunk of fasta file
 # return (filtered_seq, para_str, seqinfo)
+    rawseq = re.sub(r'[^\x00-\x7f]',r' ',rawseq) # remove non-ASCII characters
     filtered_seq = ""
     seqinfo = {}
     seqRecordList = []
