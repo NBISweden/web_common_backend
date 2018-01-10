@@ -18,6 +18,8 @@ import requests
 import gzip
 import time
 import datetime
+from Bio.PDB.PDBParser import PDBParser
+from Bio.PDB.Polypeptide import PPBuilder
 GAP = "-"
 BLOCK_SIZE = 100000 #set a good value for reading text file by block reading
 
@@ -2573,6 +2575,17 @@ def IsDNASeq(seq):#{{{
         return False
 #}}}
 
+def PDB2Seq(pdbfile):# {{{
+    """Return a list of sequences given the pdbfile
+    """
+    seqList = []
+    structure = PDBParser().get_structure('', pdbfile)
+    ppb=PPBuilder()
+    for pp in ppb.build_peptides(structure):
+        seqList.append(str(pp.get_sequence()))
+    return seqList
+
+# }}}
 def week_beg_end(day):#{{{
     """
     Given a date return the date of the 

@@ -13,6 +13,7 @@ import datetime
 import site
 import fcntl
 import json
+import urllib
 
 progname =  os.path.basename(sys.argv[0])
 wspace = ''.join([" "]*len(progname))
@@ -136,22 +137,6 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                 "cd %s; /app/subcons/master_subcons.sh %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
                     docker_tmp_outpath_this_seq)]
-    elif name_software in ['docker_proq3']:
-        containerID = 'proq3'
-        if 'isOnlyBuildProfile' in query_para:
-            cmd =  ["/usr/bin/docker", "exec", containerID, 
-                "script", "/dev/null", "-c", 
-                "cd %s; /home/app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
-                    docker_tmp_outpath_result, docker_seqfile_this_seq,
-                    docker_tmp_outpath_this_seq)]
-        elif 'profile' in query_para:
-            ExtractProQ3Profile(query_para['profile'], tmp_outpath_result)
-            docker_path_profile = "%s/profile"%(docker_tmp_outpath_result)
-            cmd =  ["/usr/bin/docker", "exec", containerID, 
-                "script", "/dev/null", "-c", 
-                "cd %s; /home/app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose"%(
-                    docker_path_profile, docker_seqfile_this_seq, docker_tmp_outpath_result,
-                    docker_tmp_outpath_this_seq)]
     elif name_software in ['prodres']:#{{{
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
@@ -207,7 +192,118 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
     return cmd
 
 #}}}
-def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
+def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para, g_params):# {{{
+    all_begin_time = time.time()
+    rootname = os.path.basename(os.path.splitext(infile)[0])
+    starttagfile   = "%s/runjob.start"%(outpath)
+    runjob_errfile = "%s/runjob.err"%(outpath)
+    runjob_logfile = "%s/runjob.log"%(outpath)
+    app_logfile = "%s/app.log"%(outpath)
+    finishtagfile = "%s/runjob.finish"%(outpath)
+    query_parafile = "%s/query.para.txt"%(outpath)
+    failtagfile = "%s/runjob.failed"%(outpath)
+
+    rmsg = ""
+    try:
+        name_software = query_para['name_software']
+    except KeyError:
+        name_software = ""
+
+    resultpathname = jobid
+
+    outpath_result = "%s/%s"%(outpath, resultpathname)
+    tmp_outpath_result = "%s/%s"%(tmpdir, resultpathname)
+
+    zipfile = "%s.zip"%(resultpathname)
+    zipfile_fullpath = "%s.zip"%(outpath_result)
+    resultfile_text = "%s/%s"%(outpath_result, "query.result.txt")
+    finished_seq_file = "%s/finished_seqs.txt"%(outpath_result)
+
+    for folder in [outpath_result, tmp_outpath_result]:
+        if os.path.exists(folder):
+            try:
+                shutil.rmtree(folder)
+            except:
+                datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+                msg = "[%s] Failed to delete folder %s"%(datetime, folder)
+                myfunc.WriteFile(msg+"\n", gen_errfile, "a")
+                rt_msg = myfunc.WriteFile(datetime, failtagfile)
+                if rt_msg:
+                    g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+                return 1
+
+        try:
+            os.makedirs(folder)
+        except OSError:
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            msg = "[%s] Failed to create folder %s"%(datetime, folder)
+            myfunc.WriteFile(msg+"\n", gen_errfile, "a")
+            rt_msg = myfunc.WriteFile(datetime, failtagfile)
+            if rt_msg:
+                g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+            return 1
+
+    tmp_outpath_this_model = "%s/%s"%(tmp_outpath_result, "model_%d"%(0))
+
+    # First try to retrieve the profile from archive
+    isGetProfileSuccess = False
+    if 'url_profile' in query_para:
+        # try to retrieve the profile
+        url_profile = query_para['url_profile']:
+        outfile_zip = "%s/%s.zip"%(outpath_result, "profile")
+        isRetrieveSuccess = False
+        if myfunc.IsURLExist(result_url,timeout=5):
+            try: 
+                urllib.urlretrieve (url_profile, outfile_zip)
+                isRetrieveSuccess = True 
+            except:
+                pass
+        remote_id = os.path.splitext(os.path.basename(url_profile))[0]
+        if os.path.exists(outfile_zip) and isRetrieveSuccess:
+            cmd = ["unzip", outfile_zip, "-d", tmp_outpath_this_seq]
+            try:
+                subprocess.check_output(cmd)
+                try:
+                    os.rename("%s/%s"%(tmp_outpath_this_seq, remote_id), 
+                            "%s/profile"%(tmp_outpath_this_seq))
+                    isGetProfileSuccess = True
+                    try:
+                        os.remove(outfile_zip)
+                    except:
+                        pass
+                except:
+                    pass
+            except:
+                pass 
+
+    tmp_seqfile = "%s/query.fasta"%(tmp_outpath_result)
+    tmp_outpath_profile = "%s/profile_0"%(tmp_outpath_result)
+
+    docker_tmp_seqfile = os.sep + os.sep.join(tmp_seqfile.split(os.sep)[tmp_seqfile.split(os.sep).index("static"):])
+    docker_tmp_outpath_profile = os.sep + os.sep.join(tmp_outpath_profile.split(os.sep)[tmp_outpath_profile.split(os.sep).index("static"):])
+    docker_tmp_outpath_result = os.sep + os.sep.join(tmp_outpath_result.split(os.sep)[tmp_outpath_result.split(os.sep).index("static"):])
+
+    if name_software in ['docker_proq3']:
+        myfunc.WriteFile(">query\n%s\n"%(targetseq), tmp_seqfile)
+
+        containerID = 'proq3'
+        if not isGetProfileSuccess:
+            # try to generate profile
+            cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
+                "script", "/dev/null", "-c", 
+                "cd %s; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
+                    docker_tmp_outpath_result, docker_tmp_seqfile,
+                    docker_tmp_outpath_this_seq)]
+        # then run with the pre-created profile
+        docker_path_profile = "%s/profile"%(docker_tmp_outpath_result)
+        cmd =  ["/usr/bin/docker", "exec", containerID, 
+            "script", "/dev/null", "-c", 
+            "cd %s; /home/app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose"%(
+                docker_path_profile, docker_seqfile_this_seq, docker_tmp_outpath_result,
+                docker_tmp_outpath_this_seq)]
+
+# }}}
+def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
     all_begin_time = time.time()
 
     rootname = os.path.basename(os.path.splitext(infile)[0])
@@ -219,18 +315,11 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
     query_parafile = "%s/query.para.txt"%(outpath)
     failtagfile = "%s/runjob.failed"%(outpath)
 
-    query_para = {}
-    content = myfunc.ReadFile(query_parafile)
-    if content != "":
-        query_para = json.loads(content)
-
     rmsg = ""
-
     try:
         name_software = query_para['name_software']
     except KeyError:
         name_software = ""
-
 
 
     resultpathname = jobid
@@ -298,16 +387,17 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
             continue
 
 
-        cmd = GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para)
+        cmd  = GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para)
         if len(cmd) < 1:
             datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             g_params['runjob_err'].append("[%s] empty cmd for name_software = %s"%(datetime, name_software))
             pass
 
 
+        begin_time = time.time()
+
         cmdline = " ".join(cmd)
         g_params['runjob_log'].append(" ".join(cmd))
-        begin_time = time.time()
         try:
             rmsg = subprocess.check_output(cmd)
             g_params['runjob_log'].append("workflow:\n"+rmsg+"\n")
@@ -316,6 +406,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, g_params):#{{{
             g_params['runjob_err'].append("cmdline: "+ cmdline +"\n")
             g_params['runjob_err'].append(rmsg + "\n")
             pass
+
         end_time = time.time()
         runtime_in_sec = end_time - begin_time
 
@@ -508,10 +599,34 @@ def main(g_params):#{{{
     if os.path.exists(vip_email_file):
         g_params['vip_user_list'] = myfunc.ReadIDList(vip_email_file)
 
-    numseq = myfunc.CountFastaSeq(infile)
-    g_params['debugfile'] = "%s/debug.log"%(outpath)
-    return RunJob(infile, outpath, tmpdir, email, jobid, g_params)
 
+    query_parafile = "%s/query.para.txt"%(outpath)
+    query_para = {}
+    content = myfunc.ReadFile(query_parafile)
+    if content != "":
+        query_para = json.loads(content)
+    try:
+        name_software = query_para['name_software']
+    except KeyError:
+        name_software = ""
+
+    status = 0
+
+    if name_software in ["proq3", "docker_proq3"]:
+        # treat proq3 specially, since its infile is model file, target seq is
+        # provided in the query_para
+        modelfile = os.path.splitext(infile)[0]+".pdb"
+        try:
+            targetseq = query_para['targetseq']
+        except:
+            seqList = myfunc.PDB2Seq(modelfile)
+            if len(seqList) >= 1:
+                targetseq = seqList[0]
+            status =  RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para, g_params)
+    else:
+        status =  RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params)
+
+    return status
 #}}}
 
 def InitGlobalParameter():#{{{
