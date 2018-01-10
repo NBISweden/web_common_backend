@@ -82,6 +82,15 @@ def CleanResult(name_software, query_para, outpath_this_seq):#{{{
                         os.remove(f)
                     except:
                         g_params['runjob_err'].append("Failed to delete the file %s"%(f)+"\n")
+    elif name_software in ["subcons", "docker_subcons"]:
+        if not 'isKeepTempFile' in query_para or query_para['isKeepTempFile'] == False:
+            temp_result_folder = "%s/tmp"%(outpath_this_seq)
+            if os.path.exists(temp_result_folder):
+                try:
+                    shutil.rmtree(temp_result_folder)
+                except:
+                    g_params['runjob_err'].append("Failed to delete the folder %s"%(temp_result_folder)+"\n")
+
 #}}}
 def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para):#{{{
     """Return the command for subprocess
