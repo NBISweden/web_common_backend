@@ -2400,7 +2400,7 @@ def GetSuqPriority(numseq_this_user):#{{{
     seconds_since_lastyear = time.time() - float(epoch_time_lastyear) 
     if numseq_this_user > 20000:
         numseq_this_user = 20000
-    prio = int(( (1/time.time()*1e10) * 1e6 ) ) - int(numseq_this_user**1.35)
+    prio = int(( (1/seconds_since_lastyear*1e10) * 1e6 ) ) - int(numseq_this_user**1.35)
     if prio < 0:
         prio = 0
 
