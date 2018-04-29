@@ -693,6 +693,7 @@ def ValidateSeq(rawseq, para_str):#{{{
     isHasEmptySeq = False
     isHasShortSeq = False
     isHasLongSeq = False
+    isHasDNASeq = False
     cnt = 0
     for rd in seqRecordList:
         seq = rd[2].strip()
@@ -738,14 +739,6 @@ def ValidateSeq(rawseq, para_str):#{{{
         t_rawseq = rawseq.lstrip()
         if t_rawseq and t_rawseq[0] != '>':
             errinfoList.append("Bad input format. The FASTA format should have an annotation line start wit '>'")
-#         if isHasEmptySeq:
-#             errinfoList.append("Empty sequence(s) found.")
-#         if isHasShortSeq:
-#             errinfoList.append("Too short sequence(s) < %d aa found."%(g_params['MIN_LEN_SEQ']))
-#         if isHasLongSeq:
-#             errinfoList.append("Too long sequence(s) > %d aa found."%(g_params['MAX_LEN_SEQ']))
-#         if isHasDNASeq:
-#             errinfoList.append("DNA sequence(s) found.")
         errinfoList + li_warn_info
         if not isHasShortSeq and not isHasEmptySeq and not isHasLongSeq and not isHasDNASeq:
             errinfoList.append("Please input your sequence in FASTA format.")
@@ -2531,6 +2524,8 @@ class Service_submitseq(ServiceBase):
 
         numseq_str = "%d"%(seqinfo['numseq'])
         warninfo = seqinfo['warninfo']
+        if warninfo == "":
+            warninfo = "None"
         jobid = "None"
         url = "None"
         if filtered_seq == "":

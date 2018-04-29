@@ -12,6 +12,7 @@ import sys
 import myfunc
 import datetime
 import tabulate
+import time
 def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
         runtime_in_sec, base_www_url, statfile=""):
     try:
@@ -209,6 +210,71 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
     except IOError:
         print "Failed to write to file %s"%(outfile)
 #}}}
+def WriteProQ3TextResultFile(outfile, query_para, modelFileList, #{{{
+        runtime_in_sec, base_www_url, proq3opt, statfile=""):
+    try:
+        fpout = open(outfile, "w")
+
+        try:
+            method_quality = query_para['method_quality']
+        except KeyError:
+            method_quality = 'sscore'
+
+        fpstat = None
+        numTMPro = 0
+
+        if statfile != "":
+            fpstat = open(statfile, "w")
+        numModel = len(modelFileList)
+
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print >> fpout, "##############################################################################"
+        print >> fpout, "# ProQ3 result file"
+        print >> fpout, "# Generated from %s at %s"%(base_www_url, date)
+        print >> fpout, "# Options for Proq3: %s"%(str(proq3opt))
+        print >> fpout, "# Total request time: %.1f seconds."%(runtime_in_sec)
+        print >> fpout, "# Number of finished models: %d"%(numModel)
+        print >> fpout, "##############################################################################"
+        print >> fpout
+        print >> fpout, "# Global scores"
+        fpout.write("# %10s"%("Model"))
+
+        cnt = 0
+        for i  in xrange(numModel):
+            modelfile = modelFileList[i]
+            globalscorefile = "%s.proq3.%s.global"%(modelfile, method_quality)
+            if not os.path.exists(globalscorefile):
+                globalscorefile = "%s.proq3.global"%(modelfile)
+            (globalscore, itemList) = ReadProQ3GlobalScore(globalscorefile)
+            if i == 0:
+                for ss in itemList:
+                    fpout.write(" %12s"%(ss))
+                fpout.write("\n")
+
+            try:
+                if globalscore:
+                    fpout.write("%2s %10s"%("", "model_%d"%(i)))
+                    for jj in xrange(len(itemList)):
+                        fpout.write(" %12f"%(globalscore[itemList[jj]]))
+                    fpout.write("\n")
+                else:
+                    print >> fpout, "%2s %10s"%("", "model_%d"%(i))
+            except:
+                pass
+
+        print >> fpout, "\n# Local scores"
+        for i  in xrange(numModel):
+            modelfile = modelFileList[i]
+            localscorefile = "%s.proq3.%s.local"%(modelfile, method_quality)
+            if not os.path.exists(localscorefile):
+                localscorefile = "%s.proq3.local"%(modelfile)
+            print >> fpout, "\n# Model %d"%(i)
+            content = myfunc.ReadFile(localscorefile)
+            print >> fpout, content
+
+    except IOError:
+        print "Failed to write to file %s"%(outfile)
+#}}}
 def WriteTextResultFile(name_software, outfile, outpath_result, maplist,#{{{
         runtime_in_sec, base_www_url, statfile=""):
     if name_software in ["subcons", "docker_subcons"]:
@@ -266,3 +332,62 @@ def IsFrontEndNode(base_www_url):#{{{
         else:
             return True
 #}}}
+def ReadProQ3GlobalScore(infile):#{{{
+    #return globalscore and itemList
+    #itemList is the name of the items
+    globalscore = {}
+    keys = []
+    try:
+        fpin = open(infile, "r")
+        lines = fpin.read().split("\n")
+        fpin.close()
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if line[0] == "P":
+                keys = line.split()
+            elif line[0].isdigit():
+                values = line.split()
+                try:
+                    values = [float(x) for x in values]
+                except:
+                    values = []
+        if len(keys) == len(values):
+            for i in xrange(len(keys)):
+                globalscore[keys[i]] = values[i]
+    except IOError:
+        pass
+    return (globalscore, keys)
+#}}}
+def GetProQ3Option(query_para):#{{{
+    """Return the proq3opt in list
+    """
+    yes_or_no_opt = {}
+    for item in ['isDeepLearning', 'isRepack', 'isKeepFiles']:
+        if query_para[item]:
+            yes_or_no_opt[item] = "yes"
+        else:
+            yes_or_no_opt[item] = "no"
+
+    proq3opt = [
+            "-r", yes_or_no_opt['isRepack'],
+            "-deep", yes_or_no_opt['isDeepLearning'],
+            "-k", yes_or_no_opt['isKeepFiles'],
+            "-quality", query_para['method_quality'],
+            "-output_pdbs", "yes"         #always output PDB file (with proq3 written at the B-factor column)
+            ]
+    if 'targetlength' in query_para:
+        proq3opt += ["-t", str(query_para['targetlength'])]
+
+    return proq3opt
+
+#}}}
+def WriteDateTimeTagFile(outfile, g_params):# {{{
+    datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+    if not os.path.exists(outfile):
+        rt_msg = myfunc.WriteFile(datetime, finishtagfile)
+        if rt_msg:
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+# }}}

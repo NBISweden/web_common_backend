@@ -93,6 +93,29 @@ def CleanResult(name_software, query_para, outpath_this_seq):#{{{
                     g_params['runjob_err'].append("Failed to delete the folder %s"%(temp_result_folder)+"\n")
 
 #}}}
+def RunCmd(cmd):# {{{
+    """Input cmd in list
+       Run the command and also output message to logs
+    """
+    begin_time = time.time()
+
+    cmdline = " ".join(cmd)
+    g_params['runjob_log'].append(" ".join(cmd))
+    try:
+        rmsg = subprocess.check_output(cmd)
+        g_params['runjob_log'].append("workflow:\n"+rmsg+"\n")
+    except subprocess.CalledProcessError, e:
+        g_params['runjob_err'].append(str(e)+"\n")
+        g_params['runjob_err'].append("cmdline: "+ cmdline +"\n")
+        g_params['runjob_err'].append(rmsg + "\n")
+        pass
+
+    end_time = time.time()
+    runtime_in_sec = end_time - begin_time
+
+    return runtime_in_sec
+# }}}
+
 def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para):#{{{
     """Return the command for subprocess
     """
@@ -209,10 +232,14 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     runjob_logfile = "%s/runjob.log"%(outpath)
     app_logfile = "%s/app.log"%(outpath)
     finishtagfile = "%s/runjob.finish"%(outpath)
-    query_parafile = "%s/query.para.txt"%(outpath)
     failtagfile = "%s/runjob.failed"%(outpath)
-
     rmsg = ""
+
+    try:
+        method_quality = query_para['method_quality']
+    except KeyError:
+        method_quality = 'sscore'
+
     try:
         name_software = query_para['name_software']
     except KeyError:
@@ -225,10 +252,10 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
 
     zipfile = "%s.zip"%(resultpathname)
     zipfile_fullpath = "%s.zip"%(outpath_result)
-    resultfile_text = "%s/%s"%(outpath_result, "query.result.txt")
-    finished_seq_file = "%s/finished_seqs.txt"%(outpath_result)
+    resultfile_text = "%s/%s"%(outpath_result, "query.proq3.txt")
+    finished_model_file = "%s/finished_models.txt"%(outpath_result)
 
-    for folder in [outpath_result, tmp_outpath_result]:
+    for folder in [tmp_outpath_result]:
         if os.path.exists(folder):
             try:
                 shutil.rmtree(folder)
@@ -253,9 +280,10 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             return 1
 
     tmp_outpath_this_model = "%s/%s"%(tmp_outpath_result, "model_%d"%(0))
+    outpath_this_model = "%s/%s"%(outpath_result, "model_%d"%(0))
 
     # First try to retrieve the profile from archive
-    isGetProfileSuccess = False
+    isGetProfileSuccess = False# {{{
     if 'url_profile' in query_para:
         # try to retrieve the profile
         url_profile = query_para['url_profile']:
@@ -284,13 +312,20 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                     pass
             except:
                 pass 
+# }}}
 
     tmp_seqfile = "%s/query.fasta"%(tmp_outpath_result)
     tmp_outpath_profile = "%s/profile_0"%(tmp_outpath_result)
 
     docker_tmp_seqfile = os.sep + os.sep.join(tmp_seqfile.split(os.sep)[tmp_seqfile.split(os.sep).index("static"):])
+    docker_modelfile= os.sep + os.sep.join(modelfile.split(os.sep)[modelfile.split(os.sep).index("static"):])
     docker_tmp_outpath_profile = os.sep + os.sep.join(tmp_outpath_profile.split(os.sep)[tmp_outpath_profile.split(os.sep).index("static"):])
+    docker_tmp_outpath_this_model = os.sep + os.sep.join(tmp_outpath_this_model.split(os.sep)[tmp_outpath_this_model.split(os.sep).index("static"):])
     docker_tmp_outpath_result = os.sep + os.sep.join(tmp_outpath_result.split(os.sep)[tmp_outpath_result.split(os.sep).index("static"):])
+
+    timefile = "%s/time.txt"%(tmp_outpath_result)
+    runtime_in_sec_profile = -1.0
+    runtime_in_sec_model = -1.0
 
     if name_software in ['docker_proq3']:
         myfunc.WriteFile(">query\n%s\n"%(targetseq), tmp_seqfile)
@@ -302,14 +337,86 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                 "script", "/dev/null", "-c", 
                 "cd %s; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
                     docker_tmp_outpath_result, docker_tmp_seqfile,
-                    docker_tmp_outpath_this_seq)]
+                    docker_tmp_outpath_profile)]
+            runtime_in_sec = RunCmd(cmd)
+            myfunc.WriteFile("%s;%f\n"%("profile_0",runtime_in_sec), timefile, "a", True)
+            runtime_in_sec_profile = runtime_in_sec
+
         # then run with the pre-created profile
-        docker_path_profile = "%s/profile"%(docker_tmp_outpath_result)
+        proq3opt = GetProQ3Option(query_para)
         cmd =  ["/usr/bin/docker", "exec", containerID, 
             "script", "/dev/null", "-c", 
-            "cd %s; /home/app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose"%(
-                docker_path_profile, docker_seqfile_this_seq, docker_tmp_outpath_result,
-                docker_tmp_outpath_this_seq)]
+            "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
+                docker_tmp_outpath_result, docker_tmp_outpath_profile,
+                docker_modelfile, docker_tmp_outpath_this_model, "
+                ".join(proq3opt))]
+        runtime_in_sec = RunCmd(cmd)
+        myfunc.WriteFile("%s;%f\n"%("model_0",runtime_in_sec), timefile, "a", True)
+        runtime_in_sec_model = runtime_in_sec
+
+    if os.path.exists(tmp_outpath_result):
+        cmd = ["mv","-f", tmp_outpath_result, outpath_result]
+        isCmdSuccess = False
+        try:
+            subprocess.check_output(cmd)
+            isCmdSuccess = True
+        except subprocess.CalledProcessError, e:
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            msg =  "[%s] Failed to run proq3 for this model\n"%(datetime)
+            g_params['runjob_err'].append(msg)
+            g_params['runjob_err'].append(str(e)+"\n")
+            pass
+
+        CleanResult(name_software, query_para, outpath_result)
+
+        if isCmdSuccess:
+            globalscorefile = "%s/%s.proq3.%s.global"%(outpath_this_model, "query_0.pdb", method_quality)
+            (globalscore, itemList) = webserver_common.ReadProQ3GlobalScore(globalscorefile)
+            modelseqfile = "%s/%s.fasta"%(outpath_this_model, "query_0.pdb")
+            modellength = myfunc.GetSingleFastaLength(modelseqfile)
+
+            modelinfo = ["model_0", str(modellength), str(runtime_in_sec_model)]
+            myfunc.WriteFile("\t".join(modelinfo)+"\n", finished_model_file, "a")
+            modelFileList = ["%s/%s"%(outpath_this_model, "query_0.pdb")]
+            webserver_common.WriteProQ3TextResultFile(resultfile_text, query_para, modelFileList,
+                    runtime_in_sec_model, g_params['base_www_url'], proq3opt, statfile="")
+
+    if len(g_params['runjob_log']) > 0 :
+        rt_msg = myfunc.WriteFile("\n".join(g_params['runjob_log'])+"\n", runjob_logfile, "a")
+        if rt_msg:
+            g_params['runjob_err'].append(rt_msg)
+
+
+    # make the zip file for all result
+    os.chdir(outpath)
+    cmd = ["zip", "-rq", zipfile, resultpathname]
+    try:
+        subprocess.check_output(cmd)
+    except subprocess.CalledProcessError, e:
+        g_params['runjob_err'].append(str(e))
+        pass
+
+    # write finish tag file
+    webserver_common.WriteDateTimeTagFile(finishtagfile, g_params)
+
+    isSuccess = False
+    if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
+        isSuccess = True
+    else:
+        isSuccess = False
+        webserver_common.WriteDateTimeTagFile(failtagfile, g_params)
+
+    if g_params['runjob_err'] == []:
+        try:
+            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+            g_params['runjob_log'].append("[%s] shutil.rmtree(%s)"% (datetime, tmpdir))
+            shutil.rmtree(tmpdir)
+        except:
+            g_params['runjob_err'].append("[%s] Failed to delete tmpdir %s"%(datetime, tmpdir))
+    if len(g_params['runjob_err']) > 0:
+        rt_msg = myfunc.WriteFile("\n".join(g_params['runjob_err'])+"\n", runjob_errfile, "w")
+        return 1
+    return 0
 
 # }}}
 def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
@@ -321,7 +428,6 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
     runjob_logfile = "%s/runjob.log"%(outpath)
     app_logfile = "%s/app.log"%(outpath)
     finishtagfile = "%s/runjob.finish"%(outpath)
-    query_parafile = "%s/query.para.txt"%(outpath)
     failtagfile = "%s/runjob.failed"%(outpath)
 
     rmsg = ""
@@ -402,22 +508,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             g_params['runjob_err'].append("[%s] empty cmd for name_software = %s"%(datetime, name_software))
             pass
 
-
-        begin_time = time.time()
-
-        cmdline = " ".join(cmd)
-        g_params['runjob_log'].append(" ".join(cmd))
-        try:
-            rmsg = subprocess.check_output(cmd)
-            g_params['runjob_log'].append("workflow:\n"+rmsg+"\n")
-        except subprocess.CalledProcessError, e:
-            g_params['runjob_err'].append(str(e)+"\n")
-            g_params['runjob_err'].append("cmdline: "+ cmdline +"\n")
-            g_params['runjob_err'].append(rmsg + "\n")
-            pass
-
-        end_time = time.time()
-        runtime_in_sec = end_time - begin_time
+        runtime_in_sec = RunCmd(cmd)
 
         aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq)
         if not os.path.exists(aaseqfile):
@@ -479,7 +570,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             g_params['runjob_err'].append(rt_msg)
 
 
-    # now write the text output to a single file
+    # make the zip file for all result
     statfile = "%s/%s"%(outpath_result, "stat.txt")
     os.chdir(outpath)
     cmd = ["zip", "-rq", zipfile, resultpathname]
@@ -490,22 +581,14 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         pass
 
     # write finish tag file
-    datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-    if os.path.exists(finished_seq_file):
-        rt_msg = myfunc.WriteFile(datetime, finishtagfile)
-        if rt_msg:
-            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+    webserver_common.WriteDateTimeTagFile(finishtagfile, g_params)
 
     isSuccess = False
     if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
         isSuccess = True
     else:
         isSuccess = False
-        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-        rt_msg = myfunc.WriteFile(datetime, failtagfile)
-        if rt_msg:
-            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+        webserver_common.WriteDateTimeTagFile(failtagfile, g_params)
 
     if g_params['runjob_err'] == []:
         try:
@@ -622,9 +705,15 @@ def main(g_params):#{{{
     status = 0
 
     if name_software in ["proq3", "docker_proq3"]:
-        # treat proq3 specially, since its infile is model file, target seq is
+        # for proq3, model is provided in query_para
         # provided in the query_para
-        modelfile = os.path.splitext(infile)[0]+".pdb"
+        try:
+            model = query_para['pdb_model']
+        except:
+            myfunc.WriteFile("key pdb_model is empty. Aborted.\n", gen_errfile, "a", True)
+            return 1
+        modelfile = "%s/query.pdb"%(outpath)
+        myfunc.WriteFile(model, modelfile)
         try:
             targetseq = query_para['targetseq']
         except:
