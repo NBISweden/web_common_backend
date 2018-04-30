@@ -357,7 +357,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         cmd =  ["/usr/bin/docker", "exec", containerID, 
             "script", "/dev/null", "-c", 
             "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
-                docker_tmp_outpath_result, docker_tmp_outpath_profile,
+                docker_tmp_outpath_result, "%s/query.fasta"%(docker_tmp_outpath_profile),
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
         runtime_in_sec = RunCmd(cmd)
         cmdline = " ".join(cmd)
