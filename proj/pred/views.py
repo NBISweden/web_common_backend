@@ -882,7 +882,7 @@ def RunQuery_wsdl_local(rawseq, filtered_seq, seqinfo):#{{{
 
     rtvalue = SubmitQueryToLocalQueue(seqinfo, tmpdir, rstdir, isOnlyGetCache=False)
     if rtvalue != 0:
-        return ""
+        return "None"
     else:
         return jobid
 #}}}
@@ -908,7 +908,7 @@ def SubmitQueryToLocalQueue(query, tmpdir, rstdir, isOnlyGetCache=False):#{{{
         cmd += ["-only-get-cache"]
     cmdline = " ".join(cmd)
     try:
-        rmsg = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        rmsg = subprocess.check_output(cmd)
         myfunc.WriteFile("cmdline: " + cmdline +"\n", debugfile, "a", True)
         myfunc.WriteFile(rmsg+"\n", debugfile, "a", True)
     except subprocess.CalledProcessError, e:
@@ -2567,7 +2567,7 @@ class Service_submitseq(ServiceBase):
             else:
                 seqinfo['isForceRun'] = False
             jobid = RunQuery_wsdl_local(seq, filtered_seq, seqinfo)
-            if jobid == "":
+            if jobid == "None":
                 errinfo = "Failed to submit your job to the queue\n"+seqinfo['errinfo']
             else:
                 log_record = "%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\n"%(seqinfo['date'], jobid,
