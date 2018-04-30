@@ -286,7 +286,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     isGetProfileSuccess = False# {{{
     if 'url_profile' in query_para:
         # try to retrieve the profile
-        url_profile = query_para['url_profile']:
+        url_profile = query_para['url_profile']
         outfile_zip = "%s/%s.zip"%(outpath_result, "profile")
         isRetrieveSuccess = False
         if myfunc.IsURLExist(result_url,timeout=5):
@@ -348,8 +348,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             "script", "/dev/null", "-c", 
             "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
                 docker_tmp_outpath_result, docker_tmp_outpath_profile,
-                docker_modelfile, docker_tmp_outpath_this_model, "
-                ".join(proq3opt))]
+                docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
         runtime_in_sec = RunCmd(cmd)
         myfunc.WriteFile("%s;%f\n"%("model_0",runtime_in_sec), timefile, "a", True)
         runtime_in_sec_model = runtime_in_sec
