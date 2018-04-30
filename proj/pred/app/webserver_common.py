@@ -383,11 +383,11 @@ def GetProQ3Option(query_para):#{{{
     return proq3opt
 
 #}}}
-def WriteDateTimeTagFile(outfile, g_params):# {{{
+def WriteDateTimeTagFile(outfile, runjob_errfile):# {{{
     datetime = time.strftime("%Y-%m-%d %H:%M:%S")
     if not os.path.exists(outfile):
         rt_msg = myfunc.WriteFile(datetime, outfile)
-        if rt_msg:
-            datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-            g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
+        msg = "Failed to write to file %s with return message: \"%s\""%(outfile, rt_msg)
+        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+        myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
 # }}}
