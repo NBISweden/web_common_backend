@@ -101,6 +101,7 @@ def RunCmd(cmd):# {{{
 
     cmdline = " ".join(cmd)
     g_params['runjob_log'].append(" ".join(cmd))
+    rmsg = ""
     try:
         rmsg = subprocess.check_output(cmd)
         g_params['runjob_log'].append("workflow:\n"+rmsg+"\n")
@@ -226,7 +227,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
 #}}}
 def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para, g_params):# {{{
     all_begin_time = time.time()
-    rootname = os.path.basename(os.path.splitext(infile)[0])
+    rootname = os.path.basename(os.path.splitext(modelfile)[0])
     starttagfile   = "%s/runjob.start"%(outpath)
     runjob_errfile = "%s/runjob.err"%(outpath)
     runjob_logfile = "%s/runjob.log"%(outpath)
@@ -285,24 +286,33 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     # First try to retrieve the profile from archive
     isGetProfileSuccess = False# {{{
     if 'url_profile' in query_para:
+        datetime = time.strftime("%Y-%m-%d %H:%M:%S")
         # try to retrieve the profile
         url_profile = query_para['url_profile']
         outfile_zip = "%s/%s.zip"%(outpath_result, "profile")
+
+        msg = "Trying to retrieve profile from %s"%(url_profile)
+        g_params['runjob_log'].append("[%s] %s"%(datetime, msg))
+
         isRetrieveSuccess = False
-        if myfunc.IsURLExist(result_url,timeout=5):
+        if myfunc.IsURLExist(url_profile,timeout=5):
             try: 
                 urllib.urlretrieve (url_profile, outfile_zip)
                 isRetrieveSuccess = True 
-            except:
+            except Exception as e:
+                msg = "Failed to retrieve profile from  %s. Err = %s"%(url_profile, e)
+                g_params['runjob_log'].append("[%s] %s"%(datetime, msg))
                 pass
         remote_id = os.path.splitext(os.path.basename(url_profile))[0]
         if os.path.exists(outfile_zip) and isRetrieveSuccess:
+            msg = "Retrieved profile from %s"%(url_profile)
+            g_params['runjob_log'].append("[%s] %s"%(datetime, msg))
             cmd = ["unzip", outfile_zip, "-d", tmp_outpath_this_seq]
             try:
                 subprocess.check_output(cmd)
                 try:
                     os.rename("%s/%s"%(tmp_outpath_this_seq, remote_id), 
-                            "%s/profile"%(tmp_outpath_this_seq))
+                            "%s/profile_0"%(tmp_outpath_this_seq))
                     isGetProfileSuccess = True
                     try:
                         os.remove(outfile_zip)
@@ -343,13 +353,17 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             runtime_in_sec_profile = runtime_in_sec
 
         # then run with the pre-created profile
-        proq3opt = GetProQ3Option(query_para)
+        proq3opt = webserver_common.GetProQ3Option(query_para)
         cmd =  ["/usr/bin/docker", "exec", containerID, 
             "script", "/dev/null", "-c", 
             "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
                 docker_tmp_outpath_result, docker_tmp_outpath_profile,
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
         runtime_in_sec = RunCmd(cmd)
+        cmdline = " ".join(cmd)
+        msg = "cmdline: %s"%(cmdline)
+        g_params['runjob_log'].append("[%s] %s"%(datetime, msg))
+
         myfunc.WriteFile("%s;%f\n"%("model_0",runtime_in_sec), timefile, "a", True)
         runtime_in_sec_model = runtime_in_sec
 
@@ -719,7 +733,8 @@ def main(g_params):#{{{
             seqList = myfunc.PDB2Seq(modelfile)
             if len(seqList) >= 1:
                 targetseq = seqList[0]
-            status =  RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para, g_params)
+        print "Run proq3"
+        status =  RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para, g_params)
     else:
         status =  RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params)
 

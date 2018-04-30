@@ -386,7 +386,7 @@ def GetProQ3Option(query_para):#{{{
 def WriteDateTimeTagFile(outfile, g_params):# {{{
     datetime = time.strftime("%Y-%m-%d %H:%M:%S")
     if not os.path.exists(outfile):
-        rt_msg = myfunc.WriteFile(datetime, finishtagfile)
+        rt_msg = myfunc.WriteFile(datetime, outfile)
         if rt_msg:
             datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             g_params['runjob_err'].append("[%s] %s"%(datetime, rt_msg))
