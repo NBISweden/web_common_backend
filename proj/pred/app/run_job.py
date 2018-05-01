@@ -367,6 +367,9 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             modellength = myfunc.GetSingleFastaLength(modelseqfile)
 
             modelinfo = ["model_0", str(modellength), str(runtime_in_sec_model)]
+            if globalscore:
+                for i in xrange(len(itemList)):
+                    modelinfo.append(str(globalscore[itemList[i]]))
             myfunc.WriteFile("\t".join(modelinfo)+"\n", finished_model_file, "a")
             modelFileList = ["%s/%s"%(outpath_this_model, "query.pdb")]
             webserver_common.WriteProQ3TextResultFile(resultfile_text, query_para, modelFileList,
