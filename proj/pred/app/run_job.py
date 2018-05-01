@@ -98,31 +98,6 @@ def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, run
                     myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
 
 #}}}
-def RunCmd(cmd, runjob_logfile, runjob_errfile):# {{{
-    """Input cmd in list
-       Run the command and also output message to logs
-    """
-    begin_time = time.time()
-
-    cmdline = " ".join(cmd)
-    datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-    msg = cmdline
-    myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_logfile, "a", True)
-    rmsg = ""
-    try:
-        rmsg = subprocess.check_output(cmd)
-        msg = "workflow: %s"%(rmsg)
-        myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_logfile, "a", True)
-    except subprocess.CalledProcessError, e:
-        msg = "cmdline: %s\nFailed with message \"%s\""%(cmdline, str(e))
-        myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
-        pass
-
-    end_time = time.time()
-    runtime_in_sec = end_time - begin_time
-
-    return runtime_in_sec
-# }}}
 
 def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para):#{{{
     """Return the command for subprocess
@@ -350,7 +325,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                 "cd %s; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
                     docker_tmp_outpath_result, docker_tmp_seqfile,
                     docker_tmp_outpath_profile)]
-            runtime_in_sec = RunCmd(cmd, runjob_logfile, runjob_errfile)
+            runtime_in_sec = webserver_common.RunCmd(cmd, runjob_logfile, runjob_errfile)
             myfunc.WriteFile("%s;%f\n"%("profile_0",runtime_in_sec), timefile, "a", True)
             runtime_in_sec_profile = runtime_in_sec
 
@@ -361,7 +336,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
                 docker_tmp_outpath_result, "%s/query.fasta"%(docker_tmp_outpath_profile),
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
-        runtime_in_sec = RunCmd(cmd, runjob_logfile, runjob_errfile)
+        runtime_in_sec = webserver_common.RunCmd(cmd, runjob_logfile, runjob_errfile)
         cmdline = " ".join(cmd)
         msg = "cmdline: %s"%(cmdline)
         myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_logfile, "a", True)
@@ -516,7 +491,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
             pass
 
-        runtime_in_sec = RunCmd(cmd, runjob_logfile, runjob_errfile)
+        runtime_in_sec = webserver_common.RunCmd(cmd, runjob_logfile, runjob_errfile)
 
         aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq)
         if not os.path.exists(aaseqfile):
