@@ -246,7 +246,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             except Exception as e:
                 msg = "Failed to delete folder %s with message %s"%(folder, str(e))
                 myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
-                webserver_common.WriteDateTimeTagFile(failtagfile, runjob_errfile)
+                webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
                 return 1
 
         try:
@@ -254,7 +254,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         except Exception as e:
             msg = "Failed to create folder %s with return message \"%s\""%(folder, str(e))
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
-            webserver_common.WriteDateTimeTagFile(failtagfile, runjob_errfile)
+            webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
             return 1
 
     tmp_outpath_this_model = "%s/%s"%(tmp_outpath_result, "model_%d"%(0))
@@ -382,14 +382,14 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         pass
 
     # write finish tag file
-    webserver_common.WriteDateTimeTagFile(finishtagfile, runjob_errfile)
+    webserver_common.WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
 
     isSuccess = False
     if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
         isSuccess = True
     else:
         isSuccess = False
-        webserver_common.WriteDateTimeTagFile(failtagfile, runjob_errfile)
+        webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
 
     if os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0:
         try:
@@ -440,7 +440,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             except Exception as e:
                 msg = "Failed to delete folder %s with message %s"%(folder, str(e))
                 myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
-                webserver_common.WriteDateTimeTagFile(failtagfile, runjob_errfile)
+                webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
                 return 1
 
         try:
@@ -448,7 +448,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         except Exception as e:
             msg = "Failed to create folder %s with message %s"%(folder, str(e))
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
-            webserver_common.WriteDateTimeTagFile(failtagfile, runjob_errfile)
+            webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
             return 1
 
     try:
@@ -559,14 +559,14 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         pass
 
     # write finish tag file
-    webserver_common.WriteDateTimeTagFile(finishtagfile, runjob_errfile)
+    webserver_common.WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
 
     isSuccess = False
     if (os.path.exists(finishtagfile) and os.path.exists(zipfile_fullpath)):
         isSuccess = True
     else:
         isSuccess = False
-        webserver_common.WriteDateTimeTagFile(failtagfile, runjob_errfile)
+        webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
 
     if os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0:
         try:
