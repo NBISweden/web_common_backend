@@ -390,7 +390,7 @@ def WriteDateTimeTagFile(outfile, runjob_logfile, runjob_errfile):# {{{
             myfunc.WriteFile(datetime, outfile)
             msg = "Write tag file %s succeeded"%(outfile)
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_logfile, "a", True)
-        except Exception as e
+        except Exception as e:
             msg = "Failed to write to file %s with message: \"%s\""%(outfile, str(e))
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
 # }}}
