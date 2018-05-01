@@ -355,6 +355,8 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             msg =  "Failed to run proq3 for this model with message \"%s\""%(str(e))
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
             pass
+        # copy time.txt to within the model folder
+        shutil.copyfile("%s/time.txt"%(outpath_result), "%s/model_0/time.txt"%(outpath_result))
 
         CleanResult(name_software, query_para, outpath_result, runjob_logfile, runjob_errfile)
 
