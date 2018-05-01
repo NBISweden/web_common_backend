@@ -98,7 +98,7 @@ def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, run
                     myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
 
 #}}}
-def RunCmd(cmd, runjob_logfile):# {{{
+def RunCmd(cmd, runjob_logfile, runjob_errfile):# {{{
     """Input cmd in list
        Run the command and also output message to logs
     """
@@ -350,18 +350,18 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                 "cd %s; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
                     docker_tmp_outpath_result, docker_tmp_seqfile,
                     docker_tmp_outpath_profile)]
-            runtime_in_sec = RunCmd(cmd, runjob_logfile)
+            runtime_in_sec = RunCmd(cmd, runjob_logfile, runjob_errfile)
             myfunc.WriteFile("%s;%f\n"%("profile_0",runtime_in_sec), timefile, "a", True)
             runtime_in_sec_profile = runtime_in_sec
 
         # then run with the pre-created profile
         proq3opt = webserver_common.GetProQ3Option(query_para)
-        cmd =  ["/usr/bin/docker", "exec", "-user", "user", containerID, 
+        cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
             "script", "/dev/null", "-c", 
             "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
                 docker_tmp_outpath_result, "%s/query.fasta"%(docker_tmp_outpath_profile),
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
-        runtime_in_sec = RunCmd(cmd, runjob_logfile)
+        runtime_in_sec = RunCmd(cmd, runjob_logfile, runjob_errfile)
         cmdline = " ".join(cmd)
         msg = "cmdline: %s"%(cmdline)
         myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_logfile, "a", True)
@@ -516,7 +516,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             myfunc.WriteFile("[%s] %s\n"%(datetime, msg),  runjob_errfile, "a", True)
             pass
 
-        runtime_in_sec = RunCmd(cmd, runjob_logfile)
+        runtime_in_sec = RunCmd(cmd, runjob_logfile, runjob_errfile)
 
         aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq)
         if not os.path.exists(aaseqfile):
