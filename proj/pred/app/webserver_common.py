@@ -13,6 +13,7 @@ import myfunc
 import datetime
 import tabulate
 import time
+import subprocess
 def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
         runtime_in_sec, base_www_url, statfile=""):
     try:
