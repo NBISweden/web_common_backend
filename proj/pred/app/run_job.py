@@ -384,14 +384,14 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         CleanResult(name_software, query_para, outpath_result, runjob_logfile, runjob_errfile)
 
         if isCmdSuccess:
-            globalscorefile = "%s/%s.proq3.%s.global"%(outpath_this_model, "query_0.pdb", method_quality)
+            globalscorefile = "%s/%s.proq3.%s.global"%(outpath_this_model, "query.pdb", method_quality)
             (globalscore, itemList) = webserver_common.ReadProQ3GlobalScore(globalscorefile)
-            modelseqfile = "%s/%s.fasta"%(outpath_this_model, "query_0.pdb")
+            modelseqfile = "%s/%s.fasta"%(outpath_this_model, "query.pdb")
             modellength = myfunc.GetSingleFastaLength(modelseqfile)
 
             modelinfo = ["model_0", str(modellength), str(runtime_in_sec_model)]
             myfunc.WriteFile("\t".join(modelinfo)+"\n", finished_model_file, "a")
-            modelFileList = ["%s/%s"%(outpath_this_model, "query_0.pdb")]
+            modelFileList = ["%s/%s"%(outpath_this_model, "query.pdb")]
             webserver_common.WriteProQ3TextResultFile(resultfile_text, query_para, modelFileList,
                     runtime_in_sec_model, g_params['base_www_url'], proq3opt, statfile="")
 
