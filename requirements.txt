@@ -9,6 +9,7 @@ lxml==3.6.0
 suds==0.4
 biopython==1.68
 django-eztables==0.3.2
+numpy
 
 pytz==2016.7
 python-dateutil==2.6.0
