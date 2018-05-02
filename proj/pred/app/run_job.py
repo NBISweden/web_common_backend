@@ -149,7 +149,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         containerID = 'subcons'
         cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
                 "script", "/dev/null", "-c", 
-                "cd %s; /app/subcons/master_subcons.sh %s %s"%(
+                "cd %s; export HOME=/home/user; /app/subcons/master_subcons.sh %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
                     docker_tmp_outpath_this_seq)]
     elif name_software in ['prodres']:#{{{
@@ -322,7 +322,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             # try to generate profile
             cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
                 "script", "/dev/null", "-c", 
-                "cd %s; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
+                "cd %s; export HOME=/home/user; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
                     docker_tmp_outpath_result, docker_tmp_seqfile,
                     docker_tmp_outpath_profile)]
             runtime_in_sec = webserver_common.RunCmd(cmd, runjob_logfile, runjob_errfile)
@@ -333,7 +333,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         proq3opt = webserver_common.GetProQ3Option(query_para)
         cmd =  ["/usr/bin/docker", "exec",  "--user", "user", containerID, 
             "script", "/dev/null", "-c", 
-            "cd %s; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
+            "cd %s; export HOME=/home/user; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
                 docker_tmp_outpath_result, "%s/query.fasta"%(docker_tmp_outpath_profile),
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
         runtime_in_sec = webserver_common.RunCmd(cmd, runjob_logfile, runjob_errfile)
