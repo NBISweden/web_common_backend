@@ -1,4 +1,4 @@
-#subcons
+# subcons
 
 ## for regular user
 
@@ -8,7 +8,7 @@
 
     docker run  -e USER_ID=$(id -u apache) -v /big/data:/data -v /scratch:/scratch --restart=always --name subcons  -it -d nanjiang/subcons  
 
-#proq3
+# proq3
 
 ## for regular user
 
