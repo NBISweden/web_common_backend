@@ -224,6 +224,16 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         method_quality = 'sscore'
 
     try:
+        isDeepLearning = query_para['isDeepLearning']
+    except KeyError:
+        isDeepLearning = True
+
+    if isDeepLearning:
+        m_str = "proq3d"
+    else:
+        m_str = "proq3"
+
+    try:
         name_software = query_para['name_software']
     except KeyError:
         name_software = ""
@@ -314,6 +324,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     runtime_in_sec_profile = -1.0
     runtime_in_sec_model = -1.0
 
+
     if name_software in ['docker_proq3']:
         myfunc.WriteFile(">query\n%s\n"%(targetseq), tmp_seqfile)
 
@@ -361,7 +372,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         CleanResult(name_software, query_para, outpath_result, runjob_logfile, runjob_errfile)
 
         if isCmdSuccess:
-            globalscorefile = "%s/%s.proq3.%s.global"%(outpath_this_model, "query.pdb", method_quality)
+            globalscorefile = "%s/%s.%s.%s.global"%(outpath_this_model,  "query.pdb", m_str, method_quality)
             (globalscore, itemList) = webserver_common.ReadProQ3GlobalScore(globalscorefile)
             modelseqfile = "%s/%s.fasta"%(outpath_this_model, "query.pdb")
             modellength = myfunc.GetSingleFastaLength(modelseqfile)
