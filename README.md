@@ -52,6 +52,15 @@ Email: nanjiang.shu@scilifelab.se
     to make sure that python can use all other system-wide installed packages
 
 
+## Supported methods
+
+* TOPCONS2
+* SCAMPI2-single
+* SCAMPI2-MSA
+* SubCons (using Docker)
+* ProQ3/ProQ3D (using Docker)
+* PRODRES
+
 ## Variables 
 
 * variable for the software to be used: name\_software
