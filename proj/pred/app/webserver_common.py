@@ -395,6 +395,9 @@ def GetProQ3Option(query_para):#{{{
     if 'targetlength' in query_para:
         proq3opt += ["-t", str(query_para['targetlength'])]
 
+    if 'submitter' in query_para and query_para['submitter'] in ['CAMEO', 'VIP']:
+        proq3opt += ["-return_dist", "yes"]
+
     return proq3opt
 
 #}}}
