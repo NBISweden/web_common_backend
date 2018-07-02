@@ -584,7 +584,8 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         isSuccess = False
         webserver_common.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
 
-    if os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0:
+    # try to delete the tmpdir if there is no error
+    if not (os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0):
         try:
             datetime = time.strftime("%Y-%m-%d %H:%M:%S")
             msg =  "shutil.rmtree(%s)"%(tmpdir)
