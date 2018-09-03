@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 # check if the suq queue is hang, if so, clean it
-#Created 2016-02-29, updated 2017-04-11, Nanjiang Shu
+#Created 2016-02-29, updated 2018-09-03, Nanjiang Shu
 use CGI qw(:standard);
 use CGI qw(:cgi-lib);
 use CGI qw(:upload);
@@ -38,8 +38,10 @@ if (grep { $_ eq $remote_host } @auth_iplist) {
     my $command =  "pgrep suq | wc -l ";
     $numsuqjob = `$command`;
     chomp($numsuqjob);
+    my $idx_first_wait_job = `$suq -b $suqbase ls | awk '{if (\$3=="Running" || \$3=="Wait") print}' | awk '{if(\$3=="Wait") print NR}' | head -n 1 2>>$errfile`;
+
     print "<pre>";
-    if ($numsuqjob >= $threshold){
+    if ($numsuqjob >= $threshold || $idx_first_wait_job == 1 ){
         print "numsuqjob = $numsuqjob >= $threshold. Try to clean the queue\n";
         `rm -rf /scratch/.suq ; rm -rf /tmp/.suq.*/; pgrep suq | xargs kill `;
         print "rm -rf /scratch/.suq ; rm -rf /tmp/.suq.*/; pgrep suq | xargs kill\n\n";
