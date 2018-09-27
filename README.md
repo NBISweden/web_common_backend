@@ -1,14 +1,14 @@
-# Generic web-server framework 
+# Generic backend for protein prediction web servers
 
 ## Description:
     This is a generic web-server framework for protein structure prediction,
     supposed to run on the computational node as a backend.
-    called by WSDL or REST interface (to be developed)
+    called by WSDL
 
 ## Author
 Nanjiang Shu
 
-Short-term bioinformatics support at NBIS
+System developer at NBIS
 
 Email: nanjiang.shu@scilifelab.se
 
