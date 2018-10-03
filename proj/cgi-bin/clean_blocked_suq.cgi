@@ -41,7 +41,7 @@ if (grep { $_ eq $remote_host } @auth_iplist) {
     my $running_after_wait = `$suq -b $suqbase ls | awk '{if (\$3=="Running" || \$3=="Wait") print \$3}' | tr '\n' '_' | grep "Wait_Running" 2>>$errfile`;
 
     print "<pre>";
-    if ($numsuqjob >= $threshold || $running_after_wait -ne "" ){
+    if ($numsuqjob >= $threshold || $running_after_wait ne "" ){
         print "numsuqjob = $numsuqjob >= $threshold. Try to clean the queue\n";
         `rm -rf /scratch/.suq ; rm -rf /tmp/.suq.*/; pgrep suq | xargs kill `;
         print "rm -rf /scratch/.suq ; rm -rf /tmp/.suq.*/; pgrep suq | xargs kill\n\n";
