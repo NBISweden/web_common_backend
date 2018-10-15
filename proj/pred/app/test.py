@@ -26,8 +26,13 @@ if 0:#{{{
     print "size=",size
     print "humansize=", myfunc.Size_byte2human(size)#}}}
 
-if 1:
+if 0:
     newsfile = "%s/static/doc/news.txt"%(basedir)
     newsList = myfunc.ReadNews(newsfile)
     print newsList
 
+if 1:
+    for numseq_this_user in range(0, 10000, 100):
+        priority = myfunc.GetSuqPriority(numseq_this_user)
+        print "%d\t%d"%(numseq_this_user, priority)
+    
