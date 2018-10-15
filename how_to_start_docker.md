@@ -6,7 +6,7 @@
 
 ## run apache user
 
-    docker run -v /big/data:/data -v /scratch:/scratch -v /var/www/html/common_backend/proj/pred/static/:/static -u $(id -u apache):$(id -g apache) --restart=always -it --name subcons  -d nanjiang/subcons
+    docker run -e USER_ID=$(id -u apache) -v /big/data:/data -v /scratch:/scratch -v /var/www/html/common_backend/proj/pred/static/:/static  --restart=always -it --name subcons  -d nanjiang/subcons 
 
 # proq3
 
