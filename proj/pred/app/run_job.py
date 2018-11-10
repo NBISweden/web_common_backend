@@ -163,9 +163,10 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         identifier_name = query_para['identifier_name']
         containerID = 'pathopred'
         cmd =  ["docker", "exec", "--user", "root", containerID, 
-                                "script", "/dev/null", "-c", 
-                                                "cd %s; export HOME=/home/user; /home/app/pathopred/master_pathopred.sh %s %s %s %s"%(
-                                                                        docker_tmp_outpath_result, docker_seqfile_this_seq, docker_variant_file, docker_tmp_outpath_this_seq, identifier_name)]
+                "script", "/dev/null", "-c", 
+                "cd %s; export HOME=/home/user; /home/app/pathopred/master_pathopred.sh %s %s %s %s"%(
+                    docker_tmp_outpath_result, docker_seqfile_this_seq, 
+                    docker_variant_file, docker_tmp_outpath_this_seq, identifier_name)]
 
     elif name_software in ['prodres']:#{{{
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
