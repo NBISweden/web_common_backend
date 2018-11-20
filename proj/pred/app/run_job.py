@@ -162,7 +162,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         docker_variant_file = os.sep + os.sep.join(variant_file.split(os.sep)[variant_file.split(os.sep).index("static"):])
         identifier_name = query_para['identifier_name']
         containerID = 'pathopred'
-        cmd =  ["docker", "exec", "--user", "root", containerID, 
+        cmd =  ["docker", "exec", "--user", "user", containerID, 
                 "script", "/dev/null", "-c", 
                 "cd %s; export HOME=/home/user; /app/pathopred/master_pathopred.sh %s %s %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq, 
