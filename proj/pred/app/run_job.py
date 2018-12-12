@@ -152,6 +152,22 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                 "cd %s; export HOME=/home/user; /app/subcons/master_subcons.sh %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
                     docker_tmp_outpath_this_seq)]
+
+    elif name_software in ['docker_pathopred']:
+        if not os.path.exists(tmp_outpath_this_seq):
+            os.makedirs(tmp_outpath_this_seq)
+        variant_text = query_para['variants']
+        variant_file = "%s/variants.fa" % tmp_outpath_result
+        myfunc.WriteFile(variant_text, variant_file)
+        docker_variant_file = os.sep + os.sep.join(variant_file.split(os.sep)[variant_file.split(os.sep).index("static"):])
+        identifier_name = query_para['identifier_name']
+        containerID = 'pathopred'
+        cmd =  ["docker", "exec", "--user", "user", containerID, 
+                "script", "/dev/null", "-c", 
+                "cd %s; export HOME=/home/user; /app/pathopred/master_pathopred.sh %s %s %s %s"%(
+                    docker_tmp_outpath_result, docker_seqfile_this_seq, 
+                    docker_variant_file, docker_tmp_outpath_this_seq, identifier_name)]
+
     elif name_software in ['prodres']:#{{{
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
