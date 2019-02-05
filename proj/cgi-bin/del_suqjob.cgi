@@ -27,13 +27,17 @@ if(!param())
     print "       del_suqjob.cgi?key=STR\n\n";
     print "Examples:\n";
     print "       del_suqjob.cgi?key=docker_subcons\n";
+    print "       del_suqjob.cgi?key=docker_subcons&dryrun=true\n";
     print "</pre>\n";
     print end_html();
 }
+my $key = "";
+my $isDryRun = "false";
+my $remote_host = $ENV{'REMOTE_ADDR'};
 if(param())
 {
-    my $key=param('key');
-    my $remote_host = $ENV{'REMOTE_ADDR'};
+    $key=param('key');
+    $isDryRun=param('dryrun');
 
     my @auth_iplist = ();
     open(IN, "<", $auth_ip_file) or die;
@@ -54,7 +58,9 @@ if(param())
         if ($numjob_to_delete > 0){
             for my $jobid (@jobidlist) {
                 print "$suq -b $suqbase del $jobid\n";
-                #`$suq -b $suqbase del $jobid`;
+                if ($isDryRun == "false"){
+                    `$suq -b $suqbase del $jobid`;
+                }
             }
 
             $suqlist = `$suq -b $suqbase ls`;
