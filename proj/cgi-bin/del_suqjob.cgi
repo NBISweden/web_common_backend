@@ -52,9 +52,10 @@ if(param())
         chomp($jobidlist_str);
         print "<pre>";
         print "Host IP: $remote_host\n\n";
-        my @jobidlist = split / /, $jobidlist_str;
+        my @jobidlist = split "\n", $jobidlist_str;
 # delete jobs
         my $numjob_to_delete = scalar(@jobidlist);
+        print "Number of jobs to be deleted: $numjob_to_delete";
         if ($numjob_to_delete > 0){
             for my $jobid (@jobidlist) {
                 print "$suq -b $suqbase del $jobid\n";
