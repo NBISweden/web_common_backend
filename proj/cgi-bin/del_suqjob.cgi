@@ -36,8 +36,12 @@ my $isDryRun = "false";
 my $remote_host = $ENV{'REMOTE_ADDR'};
 if(param())
 {
-    $key=param('key');
-    $isDryRun=param('dryrun');
+    if (param('key') ne ""){
+        $key = param('key');
+    }
+    if (param('dryrun') ne ""){
+        $isDryRun = param('dryrun');
+    }
 
     my @auth_iplist = ();
     open(IN, "<", $auth_ip_file) or die;
@@ -55,11 +59,14 @@ if(param())
         my @jobidlist = split "\n", $jobidlist_str;
 # delete jobs
         my $numjob_to_delete = scalar(@jobidlist);
-        print "Number of jobs to be deleted: $numjob_to_delete";
+        if ($isDryRun ne "false"){
+            print "[Dry Run]: ";
+        }
+        print "Number of jobs to be deleted: $numjob_to_delete\n";
         if ($numjob_to_delete > 0){
             for my $jobid (@jobidlist) {
                 print "$suq -b $suqbase del $jobid\n";
-                if ($isDryRun == "false"){
+                if ($isDryRun eq "false"){
                     `$suq -b $suqbase del $jobid`;
                 }
             }
