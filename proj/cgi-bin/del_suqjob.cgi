@@ -22,17 +22,17 @@ print start_html(-title => "delete an suq job",
 if(!param())
 {
     print "<pre>\n";
-    print "usage: curl del_suqjob.cgi -d jobid=jobid\n\n";
+    print "usage: curl del_suqjob.cgi -d key=STR\n\n";
     print "       or in the browser\n\n";
-    print "       del_suqjob.cgi?jobid=jobid\n\n";
+    print "       del_suqjob.cgi?key=STR\n\n";
     print "Examples:\n";
-    print "       del_suqjob.cgi?jobid=jobid\n";
+    print "       del_suqjob.cgi?key=docker_subcons\n";
     print "</pre>\n";
     print end_html();
 }
 if(param())
 {
-    my $jobid=param('jobid');
+    my $key=param('key');
     my $remote_host = $ENV{'REMOTE_ADDR'};
 
     my @auth_iplist = ();
@@ -44,21 +44,24 @@ if(param())
     close IN;
 
     if (grep { $_ eq $remote_host } @auth_iplist) {
-        if ($jobid=~/rst_/){
-            $jobid =`$suq -b $suqbase ls | grep $jobid | awk '{print \$1}'`;
-            chomp($jobid);
-        }
+        $jobidlist_str =`$suq -b $suqbase ls | grep $key | grep Wait | awk '{print \$1}'`;
+        chomp($jobidlist_str);
         print "<pre>";
         print "Host IP: $remote_host\n\n";
-# set ntask
-        if ($jobid ne "" ){
-            print "$suq -b $suqbase del $jobid\n";
-            `$suq -b $suqbase del $jobid`;
+        my @jobidlist = split / /, $jobidlist_str;
+# delete jobs
+        my $numjob_to_delete = scalar(@jobidlist);
+        if ($numjob_to_delete > 0){
+            for my $jobid (@jobidlist) {
+                print "$suq -b $suqbase del $jobid\n";
+                #`$suq -b $suqbase del $jobid`;
+            }
+
             $suqlist = `$suq -b $suqbase ls`;
             print "Suq list after deletion:\n\n";
             print "$suqlist\n";
         }else{
-            print "Empty jobid\n";
+            print "No job to delete.\n";
         }
 
         print "</pre>";
