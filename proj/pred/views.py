@@ -72,6 +72,7 @@ g_params['MAX_LEN_SEQ'] = 10000   # maximum length of the query sequence
 g_params['MAX_DAYS_TO_SHOW'] = 30
 g_params['BIG_NUMBER'] = 100000
 g_params['MAX_NUMSEQ_FOR_FORCE_RUN'] = 100
+g_params['MAX_NUMSEQ_PER_JOB'] = 100
 g_params['AVERAGE_RUNTIME_PER_SEQ_IN_SEC'] = 120
 g_params['MAX_ROWS_TO_SHOW_IN_TABLE'] = 2000
 g_params['MAXSIZE_UPLOAD_FILE_IN_BYTE'] = g_params['MAXSIZE_UPLOAD_FILE_IN_MB'] * 1024*1024
@@ -395,9 +396,9 @@ def RunQuery_wsdl_local(rawseq, filtered_seq, seqinfo):#{{{
 def SubmitQueryToLocalQueue(query, tmpdir, rstdir, isOnlyGetCache=False):#{{{
     scriptfile = "%s/app/submit_job_to_queue.py"%(SITE_ROOT)
     rstdir = "%s/%s"%(path_result, query['jobid'])
-    errfile = "%s/runjob.err"%(rstdir)
+    runjob_errfile = "%s/runjob.err"%(rstdir)
     debugfile = "%s/debug.log"%(rstdir) #this log only for debugging
-    logfile = "%s/runjob.log"%(rstdir)
+    runjob_logfile = "%s/runjob.log"%(rstdir)
     rmsg = ""
 
     cmd = [python_exec, scriptfile, "-nseq", "%d"%query['numseq'], "-nseq-this-user",
@@ -1291,7 +1292,7 @@ def get_results(request, jobid="1"):#{{{
     starttagfile = "%s/%s"%(rstdir, "runjob.start")
     finishtagfile = "%s/%s"%(rstdir, "runjob.finish")
     failtagfile = "%s/%s"%(rstdir, "runjob.failed")
-    errfile = "%s/%s"%(rstdir, "runjob.err")
+    runjob_errfile = "%s/%s"%(rstdir, "runjob.err")
     query_seqfile = "%s/%s"%(rstdir, "query.fa")
     raw_query_seqfile = "%s/%s"%(rstdir, "query.raw.fa")
     seqid_index_mapfile = "%s/%s/%s"%(rstdir,jobid, "seqid_index_map.txt")
@@ -1329,8 +1330,8 @@ def get_results(request, jobid="1"):#{{{
 
     resultdict['isResultFolderExist'] = True
     resultdict['errinfo'] = ""
-    if os.path.exists(errfile):
-        resultdict['errinfo'] = myfunc.ReadFile(errfile)
+    if os.path.exists(runjob_errfile):
+        resultdict['errinfo'] = myfunc.ReadFile(runjob_errfile)
 
     status = ""
     queuetime = ""
@@ -1782,12 +1783,12 @@ class Service_submitseq(ServiceBase):
             starttagfile = "%s/%s"%(rstdir, "runjob.start")
             finishtagfile = "%s/%s"%(rstdir, "runjob.finish")
             failtagfile = "%s/%s"%(rstdir, "runjob.failed")
-            errfile = "%s/%s"%(rstdir, "runjob.err")
+            runjob_errfile = "%s/%s"%(rstdir, "runjob.err")
             if os.path.exists(failtagfile):
                 status = "Failed"
                 errinfo = ""
-                if os.path.exists(errfile):
-                    errinfo = myfunc.ReadFile(errfile)
+                if os.path.exists(runjob_errfile):
+                    errinfo = myfunc.ReadFile(runjob_errfile)
             elif os.path.exists(finishtagfile):
                 status = "Finished"
                 url = result_url
