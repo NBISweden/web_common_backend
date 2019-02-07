@@ -20,6 +20,7 @@ import time
 import datetime
 from Bio.PDB.PDBParser import PDBParser
 from Bio.PDB.Polypeptide import PPBuilder
+FORMAT_DATETIME = "%Y-%m-%d %H:%M:%S %Z"
 GAP = "-"
 BLOCK_SIZE = 100000 #set a good value for reading text file by block reading
 
@@ -2445,13 +2446,16 @@ def ReadFinishedJobLog(infile, status=""):#{{{
                         jobname = strs[2]
                         ip = strs[3]
                         email = strs[4]
-                        numseq_str = strs[5]
+                        try:
+                            numseq = int(strs[5])
+                        except:
+                            numseq = 1
                         method_submission = strs[6]
                         submit_date_str = strs[7]
                         start_date_str = strs[8]
                         finish_date_str = strs[9]
                         dt[jobid] = [status_this_job, jobname, ip, email,
-                                numseq_str, method_submission, submit_date_str,
+                                numseq, method_submission, submit_date_str,
                                 start_date_str, finish_date_str]
             lines = hdl.readlines()
         hdl.close()
@@ -2512,7 +2516,6 @@ def ReadNews(infile):#{{{
         newsList = []
         pos = 0
         sizebuff = len(buff)
-        fmt = "%Y-%m-%d %H:%M:%S %Z"
         while pos < sizebuff:
             b = buff[pos:].find("\n<DATE>")
             if b >= 0:
@@ -2552,7 +2555,7 @@ def ReadNews(infile):#{{{
                 content = " ".join(content_li)
                 if date_str != "" and title != "":
                     try:
-                        st_time = time.strptime(date_str, fmt)
+                        st_time = time.strptime(date_str, FORMAT_DATETIME)
                         epoch_time = time.mktime(st_time)
                     except ValueError:
                         epoch_time = 0
