@@ -357,7 +357,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                 "cd %s; export HOME=/home/user; /app/proq3/run_proq3.sh -fasta %s -outpath %s -only-build-profile"%(
                     docker_tmp_outpath_result, docker_tmp_seqfile,
                     docker_tmp_outpath_profile)]
-            runtime_in_sec = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
+            (t_success, runtime_in_sec) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
             myfunc.WriteFile("%s;%f\n"%("profile_0",runtime_in_sec), timefile, "a", True)
             runtime_in_sec_profile = runtime_in_sec
 
@@ -368,7 +368,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             "cd %s; export HOME=/home/user; /app/proq3/run_proq3.sh --profile %s %s -outpath %s -verbose %s"%(
                 docker_tmp_outpath_result, "%s/query.fasta"%(docker_tmp_outpath_profile),
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
-        runtime_in_sec = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
+        (t_success, runtime_in_sec) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
         cmdline = " ".join(cmd)
         msg = "cmdline: %s"%(cmdline)
         myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
@@ -528,7 +528,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
             pass
 
-        runtime_in_sec = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
+        (t_success, runtime_in_sec) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
 
         aaseqfile = "%s/seq.fa"%(tmp_outpath_this_seq)
         if not os.path.exists(aaseqfile):
