@@ -20,6 +20,7 @@ import sqlite3
 import logging
 import shutil
 import subprocess
+import re
 FORMAT_DATETIME = "%Y-%m-%d %H:%M:%S %Z"
 TZ = "Europe/Stockholm"
 basedir = os.path.realpath("%s/.."%(rundir)) # path of the application, i.e. pred/
