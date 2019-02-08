@@ -540,7 +540,10 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
 
 
         if os.path.exists(tmp_outpath_this_seq):
-            cmd = ["mv","-f", tmp_outpath_this_seq, outpath_this_seq]
+            fromdir = tmp_outpath_this_seq
+            if name_software in ["prodres", "docker_prodres"]:
+                fromdir = fromdir + os.sep + "query_0"
+            cmd = ["mv","-f", fromdir, outpath_this_seq]
             isCmdSuccess = False
             try:
                 subprocess.check_output(cmd)
