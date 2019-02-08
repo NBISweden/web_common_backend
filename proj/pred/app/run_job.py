@@ -429,16 +429,18 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         webcom.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
 
     if os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0:
+        return 1
+    else: # no error, delete the tmpdir
         try:
             date_str = time.strftime(FORMAT_DATETIME)
             msg =  "shutil.rmtree(%s)"%(tmpdir)
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
             shutil.rmtree(tmpdir)
+            return 0
         except Exception as e:
             msg =  "Failed to delete tmpdir %s with message \"%s\""%(tmpdir, str(e))
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
-        return 1
-    return 0
+            return 1
 
 # }}}
 def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
@@ -609,18 +611,19 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         webcom.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
 
     # try to delete the tmpdir if there is no error
-    if not (os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0):
+    if os.path.exists(runjob_errfile) and os.stat(runjob_errfile).st_size > 0:
+        return 1
+    else:
         try:
             date_str = time.strftime(FORMAT_DATETIME)
             msg =  "shutil.rmtree(%s)"%(tmpdir)
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
             shutil.rmtree(tmpdir)
+            return 0
         except Exception as e:
             msg =  "Failed to delete tmpdir %s with message \"%s\""%(tmpdir, str(e))
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
-        return 1
-
-    return 0
+            return 1
 #}}}
 def main(g_params):#{{{
     argv = sys.argv
