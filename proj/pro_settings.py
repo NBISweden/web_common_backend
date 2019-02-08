@@ -27,7 +27,7 @@ with open('/etc/django_pro_secret_key.txt') as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 'commonbackend.*']
+ALLOWED_HOSTS = ['localhost', 'commonbackend.*', 'commonbackend.computenode.pcons3.se']
 
 computenodefile = "%s/pred/static/computenode.txt"%(BASE_DIR)
 if os.path.exists(computenodefile):
