@@ -37,10 +37,6 @@ from django.contrib.auth import authenticate, login, logout
 # import variables from settings
 from django.conf import settings
 
-# add eztables
-from django.template import add_to_builtins
-add_to_builtins('eztables.templatetags.eztables')
-
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 progname =  os.path.basename(__file__)
 rootname_progname = os.path.splitext(progname)[0]
