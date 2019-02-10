@@ -211,7 +211,7 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
                 else:
                     topfile = "%s/%s/%s/query.top"%(outpath_result, subfoldername, method)
                 if os.path.exists(topfile):
-                    (seqid, seqanno, top) = ReadSingleFasta(topfile)
+                    (seqid, seqanno, top) = myfunc.ReadSingleFasta(topfile)
                 else:
                     top = ""
                 if top == "":
@@ -250,7 +250,7 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
             dgfile = "%s/%s/dg.txt"%(outpath_result, subfoldername)
             dg_content = ""
             if os.path.exists(dgfile):
-                dg_content = ReadFile(dgfile)
+                dg_content = myfunc.ReadFile(dgfile)
             lines = dg_content.split("\n")
             dglines = []
             for line in lines:
@@ -264,13 +264,15 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
             reliability_file = "%s/%s/Topcons/reliability.txt"%(outpath_result, subfoldername)
             reliability = ""
             if os.path.exists(reliability_file):
-                reliability = ReadFile(reliability_file)
+                reliability = myfunc.ReadFile(reliability_file)
             if reliability != "":
                 print >> fpout, "\nPredicted TOPCONS reliability (left "\
                         "column=sequence position; right column=reliability)\n"
                 print >> fpout, reliability
             print >> fpout, "##############################################################################"
             cnt += 1
+
+        fpout.close()
 
         if fpstat:
             out_str_list = []
@@ -284,6 +286,11 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
 
             fpstat.close()
 
+        rstdir = os.path.realpath("%s/.."%(outpath_result))
+        runjob_logfile = "%s/%s"%(rstdir, "runjob.log")
+        runjob_errfile = "%s/%s"%(rstdir, "runjob.err")
+        finishtagfile = "%s/%s"%(rstdir, "write_result_finish.tag")
+        WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
     except IOError:
         print "Failed to write to file %s"%(outfile)
 #}}}
