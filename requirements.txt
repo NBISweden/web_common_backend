@@ -8,6 +8,9 @@ pysqlite==2.8.3
 lxml==4.3.0
 suds==0.4
 
+django-eztables==0.3.2
+django.js==0.8.1
+
 biopython==1.73
 numpy==1.16.1
 scipy==1.2.0
