@@ -59,7 +59,7 @@ if [ ! -d $rundir/proj/pred/app/soft/blast/$foldername ];then
     tmpdir=$(mktemp -d /tmp/tmpdir.setup_virtualenv.XXXXXXXXX) || { echo "Failed to create temp dir" >&2; exit 1; }
     cd $tmpdir
     echo -e "\nInstall blast-2.2.26 to proj/pred/app/soft/blast\n"
-    url=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.26/blast-2.2.26-x64-linux.tar.gz
+    url=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz
     curl -O $url
     filename=$(basename $url)
     tar -xzf $filename
