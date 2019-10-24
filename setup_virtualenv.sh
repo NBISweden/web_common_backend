@@ -40,7 +40,7 @@ tmpdir=$(mktemp -d /tmp/tmpdir.setup_virtualenv.XXXXXXXXX) || { echo "Failed to 
 cd $tmpdir
 
 echo -e "\nInstall blast to env\n"
-url=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.6.0+-x64-linux.tar.gz
+url=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.9.0/ncbi-blast-2.9.0+-x64-linux.tar.gz
 curl -O $url
 filename=$(basename $url)
 tar -xzf $filename

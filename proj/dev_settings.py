@@ -28,7 +28,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'dev.commonbackend.*', 'commonbackend.*', 'commonbackend.computenode.pcons3.se']
+ALLOWED_HOSTS = ['localhost', 'dev.commonbackend.*', 'commonbackend.*', 'commonbackend.computenode.pcons3.se', 'commonbackend.computenode.shu.se']
 
 STATIC_ROOT = "%s/pred/static"%(BASE_DIR)
 
