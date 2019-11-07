@@ -737,13 +737,25 @@ def main(g_params):#{{{
     if name_software in ["proq3", "docker_proq3"]:
         # for proq3, model is provided in query_para
         # provided in the query_para
-        try:
-            model = query_para['pdb_model']
-        except:
-            myfunc.WriteFile("key pdb_model is empty. Aborted.\n", gen_errfile, "a", True)
-            return 1
         modelfile = "%s/query.pdb"%(outpath)
-        myfunc.WriteFile(model, modelfile)
+        if 'pdb_model' in query_para:
+            model = query_para['pdb_model']
+            myfunc.WriteFile(model, modelfile)
+        elif 'url_pdb_model' in query_para:
+            url_pdb_model =  query_para['url_pdb_model']
+            webcom.loginfo("Trying to retrieve profile from %s"%(url_profile),  runjob_logfile)
+            isRetrieveSuccess = False
+            if myfunc.IsURLExist(url_profile,timeout=5):
+                try: 
+                    urllib.urlretrieve (url_pdb_model, modelfile)
+                    isRetrieveSuccess = True 
+                except Exception as e:
+                    msg = "Failed to retrieve modelfile from  %s. Err = %s"%(url_pdb_model, e)
+                    webcom.loginfo(msg,  runjob_logfile)
+                    return 1
+        else:
+            webcom.loginfo("Neither pdb_model nor url_pdb_model are provided. Exit", gen_errfile)
+            return 1
         try:
             targetseq = query_para['targetseq']
         except:
