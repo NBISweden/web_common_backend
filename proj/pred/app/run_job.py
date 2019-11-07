@@ -743,9 +743,9 @@ def main(g_params):#{{{
             myfunc.WriteFile(model, modelfile)
         elif 'url_pdb_model' in query_para:
             url_pdb_model =  query_para['url_pdb_model']
-            webcom.loginfo("Trying to retrieve profile from %s"%(url_profile),  runjob_logfile)
+            webcom.loginfo("Trying to retrieve profile from %s"%(url_pdb_model),  runjob_logfile)
             isRetrieveSuccess = False
-            if myfunc.IsURLExist(url_profile,timeout=5):
+            if myfunc.IsURLExist(url_pdb_model,timeout=5):
                 try: 
                     urllib.urlretrieve (url_pdb_model, modelfile)
                     isRetrieveSuccess = True 
