@@ -737,6 +737,8 @@ def main(g_params):#{{{
     if name_software in ["proq3", "docker_proq3"]:
         # for proq3, model is provided in query_para
         # provided in the query_para
+        runjob_errfile = "%s/runjob.err"%(outpath)
+        runjob_logfile = "%s/runjob.log"%(outpath)
         modelfile = "%s/query.pdb"%(outpath)
         if 'pdb_model' in query_para:
             model = query_para['pdb_model']
