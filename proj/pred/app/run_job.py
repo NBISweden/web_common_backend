@@ -386,15 +386,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
 
     if os.path.exists(tmp_outpath_result):
         cmd = ["mv","-f", tmp_outpath_result, outpath_result]
-        isCmdSuccess = False
-        try:
-            subprocess.check_output(cmd)
-            isCmdSuccess = True
-        except subprocess.CalledProcessError, e:
-            date_str = time.strftime(FORMAT_DATETIME)
-            msg =  "Failed to run proq3 for this model with message \"%s\""%(str(e))
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
-            pass
+        (isCmdSuccess, t_runtime) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile, True)
         # copy time.txt to within the model folder
         shutil.copyfile("%s/time.txt"%(outpath_result), "%s/model_0/time.txt"%(outpath_result))
 
@@ -418,15 +410,8 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     # make the zip file for all result
     os.chdir(outpath)
     cmd = ["zip", "-rq", zipfile, resultpathname]
-    try:
-        subprocess.check_output(cmd)
-    except subprocess.CalledProcessError, e:
-        date_str = time.strftime(FORMAT_DATETIME)
-        msg = "Failed to run zip for %s with message \"%s\""%(resultpathname, str(e))
-        myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
-        pass
+    webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
 
-    # write finish tag file
     webcom.WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
 
     isSuccess = False
@@ -555,16 +540,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             if name_software in ["prodres", "docker_prodres"]:
                 fromdir = fromdir + os.sep + "query_0"
             cmd = ["mv","-f", fromdir, outpath_this_seq]
-            isCmdSuccess = False
-            try:
-                subprocess.check_output(cmd)
-                isCmdSuccess = True
-            except subprocess.CalledProcessError, e:
-                date_str = time.strftime(FORMAT_DATETIME)
-                msg =  "Failed to run prediction for sequence No. %d\n"%(origIndex)
-                myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
-                pass
-
+            (isCmdSuccess, t_runtime) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile, True)
 
             CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, runjob_errfile)
 
@@ -601,15 +577,8 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
     statfile = "%s/%s"%(outpath_result, "stat.txt")
     os.chdir(outpath)
     cmd = ["zip", "-rq", zipfile, resultpathname]
-    try:
-        subprocess.check_output(cmd)
-    except subprocess.CalledProcessError, e:
-        date_str = time.strftime(FORMAT_DATETIME)
-        msg = "Failed to run zip for %s with message \"%s\""%(resultpathname, str(e))
-        myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
-        pass
+    webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
 
-    # write finish tag file
     webcom.WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
 
     isSuccess = False
