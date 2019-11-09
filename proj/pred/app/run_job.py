@@ -68,7 +68,6 @@ def PrintHelp(fpout=sys.stdout):#{{{
     print >> fpout, usage_exp#}}}
 
 def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, runjob_errfile):#{{{
-    date_str = time.strftime(FORMAT_DATETIME)
     if name_software in ["prodres", "docker_prodres"]:
         if not 'isKeepTempFile' in query_para or query_para['isKeepTempFile'] == False:
             temp_result_folder = "%s/temp"%(outpath_this_seq)
@@ -77,7 +76,7 @@ def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, run
                     shutil.rmtree(temp_result_folder)
                 except Exception as e:
                     msg = "Failed to delete the folder %s with message \"%s\""%(temp_result_folder, str(e))
-                    myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+                    webcom.loginfo(msg, runjob_errfile)
 
             flist = [
                     "%s/outputs/%s"%(outpath_this_seq, "Alignment.txt"),
@@ -90,7 +89,7 @@ def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, run
                         os.remove(f)
                     except Exception as e:
                         msg =  "Failed to delete the file %s with message \"%s\""%(f, str(e))
-                        myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+                        webcom.loginfo(msg,  runjob_errfile)
     elif name_software in ["subcons", "docker_subcons"]:
         if not 'isKeepTempFile' in query_para or query_para['isKeepTempFile'] == False:
             temp_result_folder = "%s/tmp"%(outpath_this_seq)
@@ -100,7 +99,7 @@ def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, run
                 except Exception as e:
                     msg = "Failed to delete the folder %s with message \"%s\""%(
                             temp_result_folder, str(e))
-                    myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+                    webcom.loginfo(msg,  runjob_errfile)
 
 #}}}
 
@@ -278,13 +277,12 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     finished_model_file = "%s/finished_models.txt"%(outpath_result)
 
     for folder in [tmp_outpath_result]:
-        date_str = time.strftime(FORMAT_DATETIME)
         if os.path.exists(folder):
             try:
                 shutil.rmtree(folder)
             except Exception as e:
                 msg = "Failed to delete folder %s with message %s"%(folder, str(e))
-                myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+                webcom.loginfo(msg,  runjob_errfile)
                 webcom.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
                 return 1
 
@@ -292,7 +290,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
             os.makedirs(folder)
         except Exception as e:
             msg = "Failed to create folder %s with return message \"%s\""%(folder, str(e))
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+            webcom.loginfo(msg,  runjob_errfile)
             webcom.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
             return 1
 
@@ -302,14 +300,12 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     # First try to retrieve the profile from archive
     isGetProfileSuccess = False# {{{
     if 'url_profile' in query_para:
-        date_str = time.strftime(FORMAT_DATETIME)
         # try to retrieve the profile
         url_profile = query_para['url_profile']
         remote_id = os.path.splitext(os.path.basename(url_profile))[0]
         outfile_zip = "%s/%s.zip"%(tmp_outpath_result, remote_id)
 
-        msg = "Trying to retrieve profile from %s"%(url_profile)
-        myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
+        webcom.loginfo("Trying to retrieve profile from %s"%(url_profile),  runjob_logfile)
 
         isRetrieveSuccess = False
         if myfunc.IsURLExist(url_profile,timeout=5):
@@ -317,12 +313,12 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                 urllib.urlretrieve (url_profile, outfile_zip)
                 isRetrieveSuccess = True 
             except Exception as e:
-                msg = "Failed to retrieve profile from  %s. Err = %s"%(url_profile, e)
-                myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
+                msg = "Failed to retrieve profile from  %s. Err = %s"%(url_profile, str(e))
+                webcom.loginfo(msg,  runjob_errfile)
                 pass
         if os.path.exists(outfile_zip) and isRetrieveSuccess:
             msg = "Retrieved profile from %s"%(url_profile)
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
+            webcom.loginfo("Retrieved profile from %s"%(url_profile),  runjob_logfile)
             cmd = ["unzip", outfile_zip, "-d", tmp_outpath_result]
             try:
                 subprocess.check_output(cmd)
@@ -377,9 +373,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
                 docker_tmp_outpath_result, "%s/query.fasta"%(docker_tmp_outpath_profile),
                 docker_modelfile, docker_tmp_outpath_this_model, " ".join(proq3opt))]
         (t_success, runtime_in_sec) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
-        cmdline = " ".join(cmd)
-        msg = "cmdline: %s"%(cmdline)
-        myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
+        webcom.loginfo("cmdline: %s"%(" ".join(cmd)),  runjob_logfile)
 
         myfunc.WriteFile("%s;%f\n"%("model_0",runtime_in_sec), timefile, "a", True)
         runtime_in_sec_model = runtime_in_sec
@@ -425,14 +419,12 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         return 1
     else: # no error, delete the tmpdir
         try:
-            date_str = time.strftime(FORMAT_DATETIME)
-            msg =  "shutil.rmtree(%s)"%(tmpdir)
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
+            webcom.loginfo("shutil.rmtree(%s)"%(tmpdir),  runjob_logfile)
             shutil.rmtree(tmpdir)
             return 0
         except Exception as e:
             msg =  "Failed to delete tmpdir %s with message \"%s\""%(tmpdir, str(e))
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+            webcom.loginfo(msg,  runjob_errfile)
             return 1
 
 # }}}
@@ -465,14 +457,13 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
     resultfile_text = "%s/%s"%(outpath_result, "query.result.txt")
     finished_seq_file = "%s/finished_seqs.txt"%(outpath_result)
 
-    date_str = time.strftime(FORMAT_DATETIME)
     for folder in [outpath_result, tmp_outpath_result]:
         if os.path.exists(folder):
             try:
                 shutil.rmtree(folder)
             except Exception as e:
                 msg = "Failed to delete folder %s with message %s"%(folder, str(e))
-                myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+                webcom.loginfo(msg,  runjob_errfile)
                 webcom.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
                 return 1
 
@@ -480,7 +471,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             os.makedirs(folder)
         except Exception as e:
             msg = "Failed to create folder %s with message %s"%(folder, str(e))
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+            webcom.loginfo(msg,  runjob_errfile)
             webcom.WriteDateTimeTagFile(failtagfile, runjob_logfile, runjob_errfile)
             return 1
 
@@ -511,17 +502,15 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         myfunc.WriteFile(seqcontent, seqfile_this_seq, "w")
 
         if not os.path.exists(seqfile_this_seq):
-            date_str = time.strftime(FORMAT_DATETIME)
             msg = "Failed to generate seq index %d"%(origIndex)
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+            webcom.loginfo(msg,  runjob_errfile)
             continue
 
 
         cmd  = GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_this_seq, query_para)
         if len(cmd) < 1:
-            date_str = time.strftime(FORMAT_DATETIME)
             msg = "empty cmd for name_software = %s"%(name_software)
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+            webcom.loginfo(msg,  runjob_errfile)
             pass
 
         (t_success, runtime_in_sec) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
@@ -593,14 +582,12 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
         return 1
     else:
         try:
-            date_str = time.strftime(FORMAT_DATETIME)
-            msg =  "shutil.rmtree(%s)"%(tmpdir)
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_logfile, "a", True)
+            webcom.loginfo("shutil.rmtree(%s)"%(tmpdir),  runjob_logfile)
             shutil.rmtree(tmpdir)
             return 0
         except Exception as e:
             msg =  "Failed to delete tmpdir %s with message \"%s\""%(tmpdir, str(e))
-            myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  runjob_errfile, "a", True)
+            webcom.loginfo(msg,  runjob_errfile)
             return 1
 #}}}
 def main(g_params):#{{{
