@@ -245,6 +245,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
     finishtagfile = "%s/runjob.finish"%(outpath)
     failtagfile = "%s/runjob.failed"%(outpath)
     rmsg = ""
+    webcom.WriteDateTimeTagFile(starttagfile, runjob_logfile, runjob_errfile)
 
     try:
         method_quality = query_para['method_quality']
@@ -460,6 +461,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
     app_logfile = "%s/app.log"%(outpath)
     finishtagfile = "%s/runjob.finish"%(outpath)
     failtagfile = "%s/runjob.failed"%(outpath)
+    webcom.WriteDateTimeTagFile(starttagfile, runjob_logfile, runjob_errfile)
 
     rmsg = ""
     try:
