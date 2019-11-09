@@ -1564,7 +1564,7 @@ def get_results(request, jobid="1"):#{{{
             else:
                 time_remain_in_sec = int(avg_newrun_time*cnt_torun+0.5)
 
-    time_remain = myfunc.second_to_human(time_remain_in_sec)
+    time_remain = myfunc.second_to_human(int(time_remain_in_sec+0.5))
     resultdict['time_remain'] = time_remain
 
     if os.path.exists(rstdir):
