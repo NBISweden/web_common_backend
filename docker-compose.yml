@@ -25,3 +25,43 @@ services:
         restart: always
         stdin_open: true
         tty: true
+
+    proq3:
+        image: nanjiang/proq3
+        container_name: proq3
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - /data/blastdb:/app/proq3/database/blastdb
+            - /scratch:/scratch
+            - /data/rosetta/rosetta_bin_linux_2016.15.58628_bundle:/app/proq3/apps/rosetta
+            - /var/www/html/common_backend/proj/pred/static/:/static
+        restart: always
+        stdin_open: true
+        tty: true
+
+    boctopus2:
+        image: nanjiang/boctopus2
+        container_name: boctopus2
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - /data:/data
+            - /scratch:/scratch
+            - /var/www/html/common_backend/proj/pred/static/:/static
+        restart: always
+        stdin_open: true
+        tty: true
+
+    pathopred:
+        image: nanjiang/pathopred
+        container_name: pathopred
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - /data/blastdb:/blastdb
+            - /scratch:/scratch
+            - /var/www/html/common_backend/proj/pred/static/:/static
+        restart: always
+        stdin_open: true
+        tty: true
