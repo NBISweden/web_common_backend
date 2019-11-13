@@ -156,7 +156,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                 "cd %s; export HOME=/home/user; /app/subcons/master_subcons.sh %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
                     docker_tmp_outpath_this_seq)]
-    elif name_software in ['boctopus2', 'docker_boctopus2']:
+    elif name_software in ['docker_boctopus2']:
         containerID = 'boctopus2'
         cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
                 "script", "/dev/null", "-c", 
