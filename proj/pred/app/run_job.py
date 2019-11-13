@@ -151,7 +151,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                 "script", "/dev/null", "-c", 
                 "cd %s; export HOME=/home/user; /app/topcons2/run_topcons2.sh %s -outpath %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
-                    docker_tmp_outpath_this_seq)]
+                    docker_tmp_outpath_result)]
     elif name_software in ['subcons']:
         runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq,
