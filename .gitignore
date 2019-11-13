@@ -18,6 +18,7 @@ env/
 bak.env/
 proj/settings.py
 
+.env
 
 
 docker-compose.yml
