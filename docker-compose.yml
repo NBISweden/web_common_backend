@@ -1,12 +1,27 @@
 version: '3.3'
 services:
     subcons:
+        image: nanjiang/subcons
+        container_name: subcons
         environment:
             - USER_ID=${USER_ID}
         volumes:
-            - '/big/data:/data'
-            - '/scratch:/scratch'
-            - '/var/www/html/common_backend/proj/pred/static/:/static'
+            - /data:/data
+            - /scratch:/scratch
+            - /var/www/html/common_backend/proj/pred/static/:/static
         restart: always
-        container_name: subcons
-        image: nanjiang/subcons
+        stdin_open: true
+        tty: true
+
+    topcons2:
+        image: nanjiang/topcons2
+        container_name: topcons2
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - /data:/data
+            - /scratch:/scratch
+            - /var/www/html/common_backend/proj/pred/static/:/static
+        restart: always
+        stdin_open: true
+        tty: true
