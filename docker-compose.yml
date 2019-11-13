@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+    subcons:
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - '/big/data:/data'
+            - '/scratch:/scratch'
+            - '/var/www/html/common_backend/proj/pred/static/:/static'
+        restart: always
+        container_name: subcons
+        image: nanjiang/subcons

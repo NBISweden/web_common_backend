@@ -21,7 +21,6 @@ proj/settings.py
 .env
 
 
-docker-compose.yml
 proj/pred/app/soft/PRODRES
 proj/pred/app/soft/blast/
 proj/pred/app/soft/blastdb
