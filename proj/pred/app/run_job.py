@@ -147,11 +147,16 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         cmd = ["python", runscript, seqfile_this_seq,  tmp_outpath_result, blastdir, blastdb]
     elif name_software in ['docker_topcons2']:
         containerID = 'topcons2'
+        apppath = '/app/topcons2'
+        runscript = '%s/workflow/pfam_workflow.py'%(apppath)
+        blastdir = "%s/%s"%(apppath, "soft/blast/blast-2.2.26")
+        blastdb = "%s/%s/%s"%(apppath, "database/blast", "uniref90.fasta" )
         cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
                 "script", "/dev/null", "-c", 
-                "cd %s; export HOME=/home/user; /app/topcons2/run_topcons2.sh %s -outpath %s"%(
-                    docker_tmp_outpath_result, docker_seqfile_this_seq,
-                    docker_tmp_outpath_result)]
+                "cd %s; export BLASTMAT=%s/data; export BLASTBIN=%s/bin; export BLASTDB=%s/database/blast; export HOME=/home/user; python %s %s %s %s %s"%(
+                    docker_tmp_outpath_result, blastdir, blastdir, apppath,
+                    runscript, docker_seqfile_this_seq,
+                    docker_tmp_outpath_result, blastdir, blastdb)]
     elif name_software in ['subcons']:
         runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq,
