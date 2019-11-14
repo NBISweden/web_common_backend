@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import sys
 import logging
+import subprocess
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 PARENT_DIR = os.path.realpath("%s/../"%(BASE_DIR))
 apppath =  "%s/pred/app/"%(BASE_DIR)
@@ -152,8 +153,8 @@ try:
     ipaddress = subprocess.check_output(cmd)
     ALLOWED_HOSTS.append(ipaddress)
     webcom.loginfo("IP address: %s"%(ipaddress), logfile)
-except:
-    webcom.loginfo("failed to get ip address", logfile)
+except subprocess.CalledProcessError as e:
+    webcom.loginfo("failed to get ip address with error message: %s"%(str(e)), logfile)
     pass
 
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
