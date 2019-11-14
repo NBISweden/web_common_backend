@@ -12,7 +12,7 @@ my $suq = "/usr/bin/suq";
 # at proj
 my $basedir = abs_path("$rundir/../");
 my $auth_ip_file = "$basedir/pred/config/auth_iplist.txt";#ip address which allows to run cgi script
-my $suqbase = "/scratch";
+my $suqbase = "/tmp";
 
 print header();
 print start_html(-title => "delete an suq job",

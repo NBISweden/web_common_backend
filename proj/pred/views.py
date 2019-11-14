@@ -74,10 +74,10 @@ g_params['FORMAT_DATETIME'] = webcom.FORMAT_DATETIME
 
 
 suq_basedir = "/tmp"
-if os.path.exists("/scratch"):
-    suq_basedir = "/scratch"
-elif os.path.exists("/tmp"):
-    suq_basedir = "/tmp"
+# if os.path.exists("/scratch"):
+#     suq_basedir = "/scratch"
+# elif os.path.exists("/tmp"):
+#     suq_basedir = "/tmp"
 rundir = SITE_ROOT
 suq_exec = "/usr/bin/suq";
 

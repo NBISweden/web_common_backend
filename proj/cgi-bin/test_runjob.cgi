@@ -15,8 +15,8 @@ my $logpath = "$basedir/pred/static/log";
 my $errfile = "$logpath/$progname.err";
 my $auth_ip_file = "$basedir/pred/config/auth_iplist.txt";#ip address which allows to run cgi script
 my $suq = "/usr/bin/suq";
-my $suqbase = "/scratch";
-my $suqworkdir = "/scratch";
+my $suqbase = "/tmp";
+my $suqworkdir = "/tmp";
 
 my $runjobscript = "$basedir/pred/app/run_job.py";
 
