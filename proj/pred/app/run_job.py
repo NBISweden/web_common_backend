@@ -157,6 +157,21 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                     docker_tmp_outpath_result, blastdir, blastdir, apppath,
                     runscript, docker_seqfile_this_seq,
                     docker_tmp_outpath_result, blastdir, blastdb)]
+    elif name_software in ['singularity_topcons2']:
+        path_image = '/data/singularity_images/topcons2.img'
+        apppath = '/app/topcons2'
+        runscript = '%s/workflow/pfam_workflow.py'%(apppath)
+        blastdir = "%s/%s"%(apppath, "soft/blast/blast-2.2.26")
+        blastdb = "%s/%s/%s"%(apppath, "database/blast", "uniref90.fasta" )
+        os.environ['BLASTMAT'] = "%s/data"%(blastdir)
+        os.environ['BLASTBIN'] = "%s/bin"%(blastdir)
+        os.environ['BLASTDB'] = "%s/%s"%(rundir, "soft/blastdb")
+        cmd =  ["singularity", "exec",
+                "-B", "%s:%s"%('/scratch', '/scratch'),
+                "-B", "%s:%s"%('/data', '/data'),
+                "-B", "%s:%s"%('/var/www/html/common_backend/proj/pred/static/:/static', '/static'),
+                path_image,
+                "python", runscript, docker_seqfile_this_seq, docker_tmp_outpath_result, blastdir, blastdb]
     elif name_software in ['subcons']:
         runscript = "%s/%s"%(rundir, "soft/subcons/master_subcons.sh")
         cmd = ["bash", runscript, seqfile_this_seq,  tmp_outpath_this_seq,
