@@ -19,7 +19,7 @@ services:
         environment:
             - USER_ID=${USER_ID}
         volumes:
-            - ${DATA_DIR}:/data
+            - ${TOPCONSDB_DIR}:/data/topcons2_database
             - ${SCRATCH_DIR}:/scratch
             - ${WEB_STATIC}:/static
         restart: always
