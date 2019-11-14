@@ -151,6 +151,7 @@ if os.path.exists(computenodefile):
 try:
     cmd = ["bash", "%s/get_ext_ip_address_cloud.sh"%(apppath)]
     ipaddress = subprocess.check_output(cmd)
+    ipaddress = ipaddress.strip()
     ALLOWED_HOSTS.append(ipaddress)
     webcom.loginfo("IP address: %s"%(ipaddress), logfile)
 except subprocess.CalledProcessError as e:
