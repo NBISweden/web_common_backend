@@ -18,7 +18,7 @@ init:
 	@echo "BLASTDB_DIR=/data/blastdb" >> .env
 	@echo "ROSETTA_DIR=/data/rosetta/rosetta_bin_linux_2016.15.58628_bundle" >> .env
 	@echo "SCRATCH_DIR=/scratch" >> .env
-	@echo "WEB_STATIC=/var/www/html/common_backend/proj/pred/static" >> .env
+	@echo "WEB_STATIC=${rundir}/proj/pred/static" >> .env
 	@echo "# Don't change from here" >> .env
 	@echo "USER_ID=$(USER_ID)" >> .env
 

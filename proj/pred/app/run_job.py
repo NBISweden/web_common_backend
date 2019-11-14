@@ -149,7 +149,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         containerID = 'topcons2'
         apppath = '/app/topcons2'
         runscript = '%s/workflow/pfam_workflow.py'%(apppath)
-        blastdir = "%s/%s"%(apppath, "tools/blast/blast-2.2.26")
+        blastdir = "%s/%s"%(apppath, "tools/blast-2.2.26")
         blastdb = "%s/%s/%s"%(apppath, "database/blast", "uniref90.fasta" )
         cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
                 "script", "/dev/null", "-c", 
@@ -161,7 +161,7 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
         path_image = '/data/singularity_images/topcons2.img'
         apppath = '/app/topcons2'
         runscript = '%s/workflow/pfam_workflow.py'%(apppath)
-        blastdir = "%s/%s"%(apppath, "tools/blast/blast-2.2.26")
+        blastdir = "%s/%s"%(apppath, "tools/blast-2.2.26")
         blastdb = "%s/%s/%s"%(apppath, "database/blast", "uniref90.fasta" )
         os.environ['BLASTMAT'] = "%s/data"%(blastdir)
         os.environ['BLASTBIN'] = "%s/bin"%(blastdir)
