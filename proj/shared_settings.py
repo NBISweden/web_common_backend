@@ -16,6 +16,11 @@ import logging
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 PARENT_DIR = os.path.realpath("%s/../"%(BASE_DIR))
 apppath =  "%s/pred/app/"%(BASE_DIR)
+path_log = "%s/pred/static/log"%(BASE_DIR)
+errfile = "%s/load_settings.log"%(errfile)
+sys.path.append(apppath)
+import myfunc
+import webserver_common as webcom
 
 # Application definition
 
@@ -145,7 +150,9 @@ try:
     cmd = ["bash", "%s/get_ext_ip_address_cloud.sh"%(apppath)]
     ipaddress = subprocess.check_output(cmd)
     ALLOWED_HOSTS.append(ipaddress)
+    webcom.loginfo("IP address: %s"%(ipaddress), errfile)
 except:
+    webcom.loginfo("failed to get ip address", errfile)
     pass
 
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
