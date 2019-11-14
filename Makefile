@@ -12,14 +12,15 @@ help:
 	@echo "where <target> is: 'init', 'up', 'down', 'clean' or 'ps' '\n"
 
 init:
-	@echo "# Please change if you have other settings" > .env
+	@echo "# Please change if you have different settings" > .env
 	@echo "DATA_DIR=/data" >> .env
 	@echo "TOPCONSDB_DIR=/data/topcons2_database" >> .env
 	@echo "BLASTDB_DIR=/data/blastdb" >> .env
 	@echo "ROSETTA_DIR=/data/rosetta/rosetta_bin_linux_2016.15.58628_bundle" >> .env
 	@echo "SCRATCH_DIR=/scratch" >> .env
+	@echo "" >> .env
+	@echo "# Please don't change from here" >> .env
 	@echo "WEB_STATIC=${rundir}/proj/pred/static" >> .env
-	@echo "# Don't change from here" >> .env
 	@echo "USER_ID=$(USER_ID)" >> .env
 
 
