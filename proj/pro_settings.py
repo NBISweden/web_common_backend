@@ -29,7 +29,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', 'commonbackend.*', 'commonbackend.computenode.pcons3.se']
 
-computenodefile = "%s/pred/static/computenode.txt"%(BASE_DIR)
+computenodefile = "%s/pred/config/computenode.txt"%(BASE_DIR)
 if os.path.exists(computenodefile):
     nodelist = []
     try:
