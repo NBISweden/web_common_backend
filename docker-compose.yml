@@ -32,8 +32,8 @@ services:
         environment:
             - USER_ID=${USER_ID}
         volumes:
-            - ${DATA_DIR}/blastdb:/app/proq3/database/blastdb
-            - ${DATA_DIR}/rosetta/rosetta_bin_linux_2016.15.58628_bundle:/app/proq3/apps/rosetta
+            - ${BLASTDB_DIR}:/app/proq3/database/blastdb
+            - ${ROSETTA_DIR}:/app/proq3/apps/rosetta
             - ${SCRATCH_DIR}:/scratch
             - ${WEB_STATIC}:/static
         restart: always
@@ -59,7 +59,7 @@ services:
         environment:
             - USER_ID=${USER_ID}
         volumes:
-            - ${DATA_DIR}/blastdb:/blastdb
+            - ${BLASTDB_DIR}:/blastdb
             - ${SCRATCH_DIR}:/scratch
             - ${WEB_STATIC}:/static
         restart: always
