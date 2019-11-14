@@ -61,10 +61,12 @@ def RunCmd(cmd, logfile, errfile, verbose=False):# {{{
         if verbose:
             msg = "workflow: %s"%(cmdline)
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  logfile, "a", True)
+            myfunc.WriteFile("%s\n"%(rmsg),  logfile, "a", True)
         isCmdSuccess = True
     except subprocess.CalledProcessError, e:
         msg = "cmdline: %s\nFailed with message \"%s\""%(cmdline, str(e))
         myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  errfile, "a", True)
+        myfunc.WriteFile("%s\n"%(rmsg),  errfile, "a", True)
         isCmdSuccess = False
         pass
 
