@@ -112,7 +112,7 @@ def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, 
     if email in g_params['vip_user_list']:
         priority = 999999999.0
 
-    webcom.loginfo("priority=%d"%(priority))
+    webcom.loginfo("priority=%d"%(priority), g_params['debugfile'])
 
     st1 = SubmitSuqJob(suq_basedir, datapath, outpath, priority, scriptfile)
 
@@ -130,7 +130,9 @@ def SubmitSuqJob(suq_basedir, datapath, outpath, priority, scriptfile):#{{{
     while cnttry < MAX_TRY:
         webcom.loginfo("run cmd: cnttry = %d, MAX_TRY=%d\n"%(cnttry,
             MAX_TRY), g_params['debugfile'])
-        webcom.RunCmd(cmd, g_params['debugfile'], g_params['debugfile'])
+        (isSubmitSuccess, t_runtime) = webcom.RunCmd(cmd, g_params['debugfile'], g_params['debugfile'])
+        if isSubmitSuccess:
+            break
         cnttry += 1
         time.sleep(0.05+cnttry*0.03)
     if isSubmitSuccess:
@@ -245,7 +247,6 @@ def InitGlobalParameter():#{{{
     g_params['isQuiet'] = True
     g_params['isForceRun'] = False
     g_params['isOnlyGetCache'] = False
-    g_params['FORMAT_DATETIME'] = webcom.FORMAT_DATETIME
     g_params['vip_user_list'] = []
     return g_params
 #}}}
