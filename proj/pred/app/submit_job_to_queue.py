@@ -130,7 +130,7 @@ def SubmitSuqJob(suq_basedir, datapath, outpath, priority, scriptfile):#{{{
     while cnttry < MAX_TRY:
         webcom.loginfo("run cmd: cnttry = %d, MAX_TRY=%d\n"%(cnttry,
             MAX_TRY), g_params['debugfile'])
-        webcom.RunCmd(cmd, runjob_logfile, runjob_errfile)
+        webcom.RunCmd(cmd, g_params['debugfile'], g_params['debugfile'])
         cnttry += 1
         time.sleep(0.05+cnttry*0.03)
     if isSubmitSuccess:
