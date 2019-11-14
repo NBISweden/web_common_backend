@@ -15,6 +15,7 @@ import os
 import logging
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 PARENT_DIR = os.path.realpath("%s/../"%(BASE_DIR))
+apppath =  "%s/pred/app/"%(BASE_DIR)
 
 # Application definition
 
@@ -128,3 +129,23 @@ USE_TZ = True
 STATIC_URL = '/static/'
 SUPER_USER_LIST = ["admin","nanjiang", "njshu"]
 
+ALLOWED_HOSTS = ['localhost', 'dev.commonbackend.*', 'commonbackend.*', 'commonbackend.computenode.pcons3.se', 'commonbackend.computenode.shu.se']
+
+computenodefile = "%s/pred/config/computenode.txt"%(BASE_DIR)
+if os.path.exists(computenodefile):
+    nodelist = []
+    try:
+        nodelist = myfunc.ReadIDList2(computenodefile,col=0)
+    except:
+        pass
+    ALLOWED_HOSTS += nodelist
+
+# add also the IP of the host to ALLOWED_HOSTS
+try:
+    cmd = ["bash", "%s/get_ext_ip_address_cloud.sh"%(apppath)]
+    ipaddress = subprocess.check_output(cmd)
+    ALLOWED_HOSTS.append(ipaddress)
+except:
+    pass
+
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))

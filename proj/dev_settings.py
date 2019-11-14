@@ -11,11 +11,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
-try:
-    from shared_settings import *
-except ImportError:
-    pass
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -28,7 +23,8 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'dev.commonbackend.*', 'commonbackend.*', 'commonbackend.computenode.pcons3.se', 'commonbackend.computenode.shu.se']
-
-STATIC_ROOT = "%s/pred/static"%(BASE_DIR)
+try:
+    from shared_settings import *
+except ImportError:
+    pass
 
