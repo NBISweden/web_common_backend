@@ -374,13 +374,59 @@ def WriteProQ3TextResultFile(outfile, query_para, modelFileList, #{{{
     except IOError:
         print "Failed to write to file %s"%(outfile)
 #}}}
+def WriteBoctopusTextResultFile(outfile, outpath_result, maplist, runtime_in_sec, base_www_url, statfile=""):#{{{
+    rstdir = os.path.realpath("%s/.."%(outpath_result))
+    runjob_logfile = "%s/%s"%(rstdir, "runjob.log")
+    runjob_errfile = "%s/%s"%(rstdir, "runjob.err")
+    finishtagfile = "%s/%s"%(rstdir, "write_result_finish.tag")
+    try:
+        fpout = open(outfile, "w")
+        fpstat = None
+        numTMPro = 0
+
+        if statfile != "":
+            fpstat = open(statfile, "w")
+
+        cnt = 0
+        for line in maplist:
+            strs = line.split('\t')
+            subfoldername = strs[0]
+            length = int(strs[1])
+            desp = strs[2]
+            seq = strs[3]
+            isTMPro = False
+            outpath_this_seq = "%s/%s"%(outpath_result, subfoldername)
+            predfile = "%s/query_topologies.txt"%(outpath_this_seq)
+            loginfo("predfile =  %s.\n"%(predfile), runjob_logfile)
+            if not os.path.exists(predfile):
+                loginfo("predfile %s does not exist\n"%(predfile), runjob_errfile)
+            (seqid, seqanno, top) = myfunc.ReadSingleFasta(predfile)
+            fpout.write(">%s\n%s\n"%(desp, top))
+            numTM = myfunc.CountTM(top)
+            if numTM >0:
+                isTMPro = True
+                numTMPro += 1
+
+            cnt += 1
+
+        if fpstat:
+            out_str_list = ["numTMPro\t%d\n"%(numTMPro)]
+            fpstat.write("%s"%("\n".join(out_str_list)))
+            fpstat.close()
+        WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
+    except IOError:
+        loginfo( "Failed to write to file %s"%(outfile), runjob_errfile)
+#}}}
 def WriteTextResultFile(name_software, outfile, outpath_result, maplist,#{{{
         runtime_in_sec, base_www_url, statfile=""):
-    if name_software in ["subcons", "docker_subcons"]:
+    if name_software in ["subcons", "docker_subcons", "singularity_subcons"]:
         WriteSubconsTextResultFile(outfile, outpath_result, maplist,
                 runtime_in_sec, base_www_url, statfile)
-    elif name_software in ["topcons2", "docker_topcons2"]:
+    elif name_software in ["topcons2", "docker_topcons2", "singularity_topcons2"]:
         WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,
+                runtime_in_sec, base_www_url, statfile)
+    elif name_software in ["boctopus2", "docker_boctopus2", "singularity_boctopus2"]:
+        WriteBoctopusTextResultFile(outfile, outpath_result, maplist,
                 runtime_in_sec, base_www_url, statfile)
 
 #}}}

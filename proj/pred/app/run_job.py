@@ -553,7 +553,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
 
         if os.path.exists(tmp_outpath_this_seq):
             fromdir = tmp_outpath_this_seq
-            if name_software in ["prodres", "docker_prodres"]:
+            if name_software in ["prodres", "docker_prodres", "singularity_prodres"]:
                 fromdir = fromdir + os.sep + "query_0"
             cmd = ["mv","-f", fromdir, outpath_this_seq]
             (isCmdSuccess, t_runtime) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile, True)
@@ -720,7 +720,7 @@ def main(g_params):#{{{
 
     status = 0
 
-    if name_software in ["proq3", "docker_proq3"]:
+    if name_software in ["proq3", "docker_proq3", "singularity_proq3"]:
         # for proq3, model is provided in query_para
         # provided in the query_para
         runjob_errfile = "%s/runjob.err"%(outpath)
