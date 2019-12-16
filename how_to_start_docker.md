@@ -40,6 +40,8 @@ WEB_STATIC=/big/data3/server/web_common_backend//proj/pred/static
 USER_ID=33
 ```
 
+Note that `topcons2_database` should be under the folder `${DATA_DIR}`
+
 You may need to modify values of some of the environmental variables
 accordingly.
 
