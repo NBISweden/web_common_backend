@@ -555,6 +555,15 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
             fromdir = tmp_outpath_this_seq
             if name_software in ["prodres", "docker_prodres", "singularity_prodres"]:
                 fromdir = fromdir + os.sep + "query_0"
+                # for prodres, also copy the aaseqfile and timefile to the
+                # fromdir
+                try:
+                    shutil.copy(aaseqfile, fromdir)
+                    shutil.copy(timefile, fromdir)
+                except Exception as e:
+                    msg = "failed to copy aaseqfile or timefile to the folder %s"%(fromdir)
+                    webcom.loginfo(msg, runjob_errfile)
+                    pass
             cmd = ["mv","-f", fromdir, outpath_this_seq]
             (isCmdSuccess, t_runtime) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile, True)
 
