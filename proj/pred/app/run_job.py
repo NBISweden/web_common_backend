@@ -409,7 +409,10 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         cmd = ["mv","-f", tmp_outpath_result, outpath_result]
         (isCmdSuccess, t_runtime) = webcom.RunCmd(cmd, runjob_logfile, runjob_errfile, True)
         # copy time.txt to within the model folder
-        shutil.copyfile("%s/time.txt"%(outpath_result), "%s/model_0/time.txt"%(outpath_result))
+        try:
+            shutil.copyfile("%s/time.txt"%(outpath_result), "%s/model_0/time.txt"%(outpath_result))
+        except Exception as e:
+            webcom.loginfo("Copy time.txt failed with errmsg=%s"%(str(e)), runjob_errfile)
 
         CleanResult(name_software, query_para, outpath_result, runjob_logfile, runjob_errfile)
 
