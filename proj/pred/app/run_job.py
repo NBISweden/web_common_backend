@@ -337,7 +337,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
         isRetrieveSuccess = False
         if myfunc.IsURLExist(url_profile,timeout=5):
             try: 
-                urllib.urlretrieve (url_profile, outfile_zip)
+                myfunc.urlretrieve (url_profile, outfile_zip, timeout=10)
                 isRetrieveSuccess = True 
             except Exception as e:
                 msg = "Failed to retrieve profile from  %s. Err = %s"%(url_profile, str(e))
@@ -747,7 +747,7 @@ def main(g_params):#{{{
             isRetrieveSuccess = False
             if myfunc.IsURLExist(url_pdb_model,timeout=5):
                 try: 
-                    urllib.urlretrieve (url_pdb_model, modelfile)
+                    myfunc.urlretrieve (url_pdb_model, modelfile, timeout=10)
                     isRetrieveSuccess = True 
                 except Exception as e:
                     msg = "Failed to retrieve modelfile from  %s. Err = %s"%(url_pdb_model, e)
