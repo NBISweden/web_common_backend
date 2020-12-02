@@ -7,7 +7,7 @@ django-eztables
 
 pyyaml==4.2b1
 pysqlite==2.8.3
-lxml==4.3.0
+lxml==4.6.2
 suds==0.4
 
 django.js==0.8.1
