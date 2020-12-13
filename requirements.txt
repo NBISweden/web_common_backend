@@ -1,13 +1,13 @@
 spyne==2.13.2-alpha
 requests==2.20.1
 mod-wsgi==4.6.5
-Django==1.11.23
+Django==1.11.27
 
 django-eztables
 
-pyyaml==4.2b1
+pyyaml==5.3.1
 pysqlite==2.8.3
-lxml==4.3.0
+lxml==4.6.2
 suds==0.4
 
 django.js==0.8.1
@@ -26,3 +26,5 @@ pycountry==18.5.26
 
 tabulate==0.8.3
 
+
+urllib3>=1.25.9 # not directly required, pinned by Snyk to avoid a vulnerability
