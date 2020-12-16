@@ -183,6 +183,16 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                 "cd %s; export HOME=/home/user; /app/subcons/master_subcons.sh %s %s"%(
                     docker_tmp_outpath_result, docker_seqfile_this_seq,
                     docker_tmp_outpath_this_seq)]
+    elif name_software in ['singularity_subcons']:
+        path_image = '/data/singularity_images/subcons.img'
+        apppath = '/app/subcons'
+        runscript = '%s/master_subcons.sh'%(apppath)
+        cmd =  ["singularity", "exec",
+                "-B", "%s:%s"%('/scratch', '/scratch'),
+                "-B", "%s:%s"%('/data', '/data'),
+                "-B", "%s:%s"%('%s/static'%(basedir), '/static'),
+                path_image,
+                runscript, docker_seqfile_this_seq, docker_tmp_outpath_result]
     elif name_software in ['docker_boctopus2']:
         containerID = 'boctopus2'
         cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
