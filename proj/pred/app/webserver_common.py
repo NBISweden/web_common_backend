@@ -523,7 +523,7 @@ def GetProQ3Option(query_para):#{{{
     """
     yes_or_no_opt = {}
     for item in ['isDeepLearning', 'isRepack', 'isKeepFiles']:
-        if query_para[item]:
+        if item in query_para and query_para[item]:
             yes_or_no_opt[item] = "yes"
         else:
             yes_or_no_opt[item] = "no"
