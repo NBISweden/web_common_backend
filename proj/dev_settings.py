@@ -24,7 +24,7 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 try:
-    from shared_settings import *
+    from .shared_settings import *
 except ImportError:
     pass
 

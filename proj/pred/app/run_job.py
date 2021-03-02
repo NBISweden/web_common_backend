@@ -15,7 +15,7 @@ import time
 import site
 import fcntl
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 FORMAT_DATETIME = webcom.FORMAT_DATETIME
 TZ = webcom.TZ
@@ -25,7 +25,7 @@ wspace = ''.join([" "]*len(progname))
 rundir = os.path.dirname(os.path.realpath(__file__))
 webserver_root = os.path.realpath("%s/../../../"%(rundir))
 activate_env="%s/env/bin/activate_this.py"%(webserver_root)
-execfile(activate_env, dict(__file__=activate_env))
+exec(compile(open(activate_env, "rb").read(), activate_env, 'exec'), dict(__file__=activate_env))
 
 site.addsitedir("%s/env/lib/python2.7/site-packages/"%(webserver_root))
 sys.path.append("/usr/local/lib/python2.7/dist-packages")
@@ -63,9 +63,9 @@ Examples:
 """%(progname)
 
 def PrintHelp(fpout=sys.stdout):#{{{
-    print >> fpout, usage_short
-    print >> fpout, usage_ext
-    print >> fpout, usage_exp#}}}
+    print(usage_short, file=fpout)
+    print(usage_ext, file=fpout)
+    print(usage_exp, file=fpout)#}}}
 
 def CleanResult(name_software, query_para, outpath_this_seq, runjob_logfile, runjob_errfile):#{{{
     if name_software in ["prodres", "docker_prodres"]:
@@ -434,7 +434,7 @@ def RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para
 
             modelinfo = ["model_0", str(modellength), str(runtime_in_sec_model)]
             if globalscore:
-                for i in xrange(len(itemList)):
+                for i in range(len(itemList)):
                     modelinfo.append(str(globalscore[itemList[i]]))
             myfunc.WriteFile("\t".join(modelinfo)+"\n", finished_model_file, "a")
             modelFileList = ["%s/%s"%(outpath_this_model, "query.pdb")]
@@ -522,7 +522,7 @@ def RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params):#{{{
 
     (seqIDList , seqAnnoList, seqList) = myfunc.ReadFasta(infile)
 
-    for ii in  xrange(len(seqIDList)):
+    for ii in  range(len(seqIDList)):
         origIndex = ii
         seq = seqList[ii]
         seqid = seqIDList[ii]
@@ -681,14 +681,14 @@ def main(g_params):#{{{
                 g_params['isQuiet'] = True
                 i += 1
             else:
-                print >> sys.stderr, "Error! Wrong argument:", argv[i]
+                print("Error! Wrong argument:", argv[i], file=sys.stderr)
                 return 1
         else:
             infile = argv[i]
             i += 1
 
     if jobid == "":
-        print >> sys.stderr, "%s: jobid not set. exit"%(sys.argv[0])
+        print("%s: jobid not set. exit"%(sys.argv[0]), file=sys.stderr)
         return 1
 
     g_params['jobid'] = jobid
@@ -701,29 +701,29 @@ def main(g_params):#{{{
     try:
         fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except IOError:
-        print >> sys.stderr, "Another instance of %s is running"%(progname)
+        print("Another instance of %s is running"%(progname), file=sys.stderr)
         return 1
 
 
     if myfunc.checkfile(infile, "infile") != 0:
         return 1
     if outpath == "":
-        print >> sys.stderr, "outpath not set. exit"
+        print("outpath not set. exit", file=sys.stderr)
         return 1
     elif not os.path.exists(outpath):
         try:
             subprocess.check_output(["mkdir", "-p", outpath])
-        except subprocess.CalledProcessError, e:
-            print >> sys.stderr, e
+        except subprocess.CalledProcessError as e:
+            print(e, file=sys.stderr)
             return 1
     if tmpdir == "":
-        print >> sys.stderr, "tmpdir not set. exit"
+        print("tmpdir not set. exit", file=sys.stderr)
         return 1
     elif not os.path.exists(tmpdir):
         try:
             subprocess.check_output(["mkdir", "-p", tmpdir])
-        except subprocess.CalledProcessError, e:
-            print >> sys.stderr, e
+        except subprocess.CalledProcessError as e:
+            print(e, file=sys.stderr)
             return 1
 
     if os.path.exists(vip_email_file):
@@ -772,7 +772,7 @@ def main(g_params):#{{{
             seqList = myfunc.PDB2Seq(modelfile)
             if len(seqList) >= 1:
                 targetseq = seqList[0]
-        print "Run proq3"
+        print("Run proq3")
         status =  RunJob_proq3(modelfile, targetseq, outpath, tmpdir, email, jobid, query_para, g_params)
     else:
         status =  RunJob(infile, outpath, tmpdir, email, jobid, query_para, g_params)

@@ -58,9 +58,9 @@ Examples:
 """%(progname)
 
 def PrintHelp(fpout=sys.stdout):#{{{
-    print >> fpout, usage_short
-    print >> fpout, usage_ext
-    print >> fpout, usage_exp#}}}
+    print(usage_short, file=fpout)
+    print(usage_ext, file=fpout)
+    print(usage_exp, file=fpout)#}}}
 
 def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, #{{{
         host_ip, base_www_url):
@@ -104,7 +104,7 @@ def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, 
     webcom.loginfo(msg, g_params['debugfile'])
 
     myfunc.WriteFile(code, scriptfile, mode="w", isFlush=True)
-    os.chmod(scriptfile, 0755)
+    os.chmod(scriptfile, 0o755)
 
     webcom.loginfo("Getting priority", g_params['debugfile'])
     priority = myfunc.GetSuqPriority(numseq_this_user)
@@ -243,9 +243,9 @@ def main(g_params):#{{{
         cmd =  ["mkdir", "-p", outpath]
         try:
             rmsg = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, e:
-            print e
-            print rmsg
+        except subprocess.CalledProcessError as e:
+            print(e)
+            print(rmsg)
             return 1
 
     if jobid == "":

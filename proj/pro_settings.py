@@ -26,7 +26,7 @@ with open('/etc/django_pro_secret_key.txt') as f:
 DEBUG = False
 
 try:
-    from shared_settings import *
+    from .shared_settings import *
 except ImportError:
     pass
 
