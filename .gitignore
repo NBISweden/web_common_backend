@@ -19,6 +19,7 @@ bak.env/
 proj/settings.py
 
 .env
+*.py.bak
 
 
 proj/pred/app/soft/PRODRES
