@@ -11,7 +11,6 @@ from proj.pred import views
 
 urlpatterns = [
     url(r'^$', views.index, name='pred.index'),
-    url(r'^submit-seq/$', views.submit_seq, name='pred.submit_seq'),
     url(r'^thanks/$', views.thanks, name='pred.thanks'),
     url(r'^queue/$', views.get_queue, name='pred.get_queue'),
     url(r'^running/$', views.get_running, name='pred.get_running'),

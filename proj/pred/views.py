@@ -78,6 +78,7 @@ g_params['path_stat'] = path_stat
 g_params['SITE_ROOT'] = SITE_ROOT
 g_params['path_result'] = path_result
 g_params['MAX_ACTIVE_USER'] = 10
+g_params['MAX_ALLOWD_NUMSEQ'] = 10
 
 
 suq_basedir = "/tmp"
