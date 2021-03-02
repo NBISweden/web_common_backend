@@ -24,6 +24,9 @@ urlpatterns = [
     url(r'^countjobcountry/$', views.get_countjob_country, name='pred.get_countjob_country'),
     url(r'^reference/$', views.get_reference, name='pred.get_reference'),
     url(r'^example/$', views.get_example, name='pred.get_example'),
+    url(r'^result/(?P<jobid>[^\/]+)/$', views.get_results, name='pred.get_results'),
+    url(r'^result/(?P<jobid>[^\/]+)/(?P<seqindex>seq_[0-9]+)/$',
+        views.get_results_eachseq, name='pred.get_results_eachseq'),
     url(r'^login/', login_required(views.login), name="pred.login"),
 
 # for spyne wsdl
