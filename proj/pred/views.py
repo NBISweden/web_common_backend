@@ -437,6 +437,343 @@ def download(request):#{{{
     return render(request, 'pred/download.html', info)
 #}}}
 
+def get_results(request, jobid="1"):#{{{
+    resultdict = {}
+    webcom.set_basic_config(request, resultdict, g_params)
+
+    #img1 = "%s/%s/%s/%s"%(SITE_ROOT, "result", jobid, "PconsC2.s400.jpg")
+    #url_img1 =  serve(request, os.path.basename(img1), os.path.dirname(img1))
+    rstdir = "%s/%s"%(path_result, jobid)
+    outpathname = jobid
+    resultfile = "%s/%s/%s/%s"%(rstdir, jobid, outpathname, "query.result.txt")
+    tarball = "%s/%s.tar.gz"%(rstdir, outpathname)
+    zipfile = "%s/%s.zip"%(rstdir, outpathname)
+    starttagfile = "%s/%s"%(rstdir, "runjob.start")
+    finishtagfile = "%s/%s"%(rstdir, "runjob.finish")
+    failtagfile = "%s/%s"%(rstdir, "runjob.failed")
+    errfile = "%s/%s"%(rstdir, "runjob.err")
+    query_seqfile = "%s/%s"%(rstdir, "query.fa")
+    raw_query_seqfile = "%s/%s"%(rstdir, "query.raw.fa")
+    seqid_index_mapfile = "%s/%s/%s"%(rstdir,jobid, "seqid_index_map.txt")
+    finished_seq_file = "%s/%s/finished_seqs.txt"%(rstdir, jobid)
+    statfile = "%s/%s/stat.txt"%(rstdir, jobid)
+    method_submission = "web"
+
+    jobinfofile = "%s/jobinfo"%(rstdir)
+    jobinfo = myfunc.ReadFile(jobinfofile).strip()
+    jobinfolist = jobinfo.split("\t")
+    if len(jobinfolist) >= 8:
+        submit_date_str = jobinfolist[0]
+        numseq = int(jobinfolist[3])
+        jobname = jobinfolist[5]
+        email = jobinfolist[6]
+        method_submission = jobinfolist[7]
+    else:
+        submit_date_str = ""
+        numseq = 1
+        jobname = ""
+        email = ""
+        method_submission = "web"
+
+    isValidSubmitDate = True
+    try:
+        submit_date = webcom.datetime_str_to_time(submit_date_str)
+    except ValueError:
+        isValidSubmitDate = False
+    current_time = datetime.now(timezone(TZ))
+
+    resultdict['isResultFolderExist'] = True
+    resultdict['errinfo'] = ""
+    if os.path.exists(errfile):
+        resultdict['errinfo'] = myfunc.ReadFile(errfile)
+
+    status = ""
+    queuetime = ""
+    runtime = ""
+    queuetime_in_sec = 0
+    runtime_in_sec = 0
+    if not os.path.exists(rstdir):
+        resultdict['isResultFolderExist'] = False
+        resultdict['isFinished'] = False
+        resultdict['isFailed'] = True
+        resultdict['isStarted'] = False
+    elif os.path.exists(failtagfile):
+        resultdict['isFinished'] = False
+        resultdict['isFailed'] = True
+        resultdict['isStarted'] = True
+        status = "Failed"
+        start_date_str = ""
+        if os.path.exists(starttagfile):
+            start_date_str = myfunc.ReadFile(starttagfile).strip()
+        isValidStartDate = True
+        isValidFailedDate = True
+        try:
+            start_date = webcom.datetime_str_to_time(start_date_str)
+        except ValueError:
+            isValidStartDate = False
+        failed_date_str = myfunc.ReadFile(failtagfile).strip()
+        try:
+            failed_date = webcom.datetime_str_to_time(failed_date_str)
+        except ValueError:
+            isValidFailedDate = False
+        if isValidSubmitDate and isValidStartDate:
+            queuetime = myfunc.date_diff(submit_date, start_date)
+            queuetime_in_sec = (start_date - submit_date).total_seconds()
+        if isValidStartDate and isValidFailedDate:
+            runtime = myfunc.date_diff(start_date, failed_date)
+            runtime_in_sec = (failed_date - start_date).total_seconds()
+    else:
+        resultdict['isFailed'] = False
+        if os.path.exists(finishtagfile):
+            resultdict['isFinished'] = True
+            resultdict['isStarted'] = True
+            status = "Finished"
+            isValidStartDate = True
+            isValidFinishDate = True
+            if os.path.exists(starttagfile):
+                start_date_str = myfunc.ReadFile(starttagfile).strip()
+            else:
+                start_date_str = ""
+            try:
+                start_date = webcom.datetime_str_to_time(start_date_str)
+            except ValueError:
+                isValidStartDate = False
+            finish_date_str = myfunc.ReadFile(finishtagfile).strip()
+            try:
+                finish_date = webcom.datetime_str_to_time(finish_date_str)
+            except ValueError:
+                isValidFinishDate = False
+            if isValidSubmitDate and isValidStartDate:
+                queuetime = myfunc.date_diff(submit_date, start_date)
+                queuetime_in_sec = (start_date - submit_date).total_seconds()
+            if isValidStartDate and isValidFinishDate:
+                runtime = myfunc.date_diff(start_date, finish_date)
+                runtime_in_sec = (finish_date - start_date).total_seconds()
+        else:
+            resultdict['isFinished'] = False
+            if os.path.exists(starttagfile):
+                isValidStartDate = True
+                start_date_str = ""
+                if os.path.exists(starttagfile):
+                    start_date_str = myfunc.ReadFile(starttagfile).strip()
+                try:
+                    start_date = webcom.datetime_str_to_time(start_date_str)
+                except ValueError:
+                    isValidStartDate = False
+                resultdict['isStarted'] = True
+                status = "Running"
+                if isValidSubmitDate and isValidStartDate:
+                    queuetime = myfunc.date_diff(submit_date, start_date)
+                    queuetime_in_sec = (start_date - submit_date).total_seconds()
+                if isValidStartDate:
+                    runtime = myfunc.date_diff(start_date, current_time)
+                    runtime_in_sec = (current_time - start_date).total_seconds()
+            else:
+                resultdict['isStarted'] = False
+                status = "Wait"
+                if isValidSubmitDate:
+                    queuetime = myfunc.date_diff(submit_date, current_time)
+                    queuetime_in_sec = (current_time - submit_date).total_seconds()
+
+    color_status = webcom.SetColorStatus(status)
+
+    file_seq_warning = "%s/%s/%s/%s"%(SITE_ROOT, "static/result", jobid, "query.warn.txt")
+    seqwarninfo = ""
+    if os.path.exists(file_seq_warning):
+        seqwarninfo = myfunc.ReadFile(file_seq_warning)
+        seqwarninfo = seqwarninfo.strip()
+
+    resultdict['file_seq_warning'] = os.path.basename(file_seq_warning)
+    resultdict['seqwarninfo'] = seqwarninfo
+    resultdict['jobid'] = jobid
+    resultdict['subdirname'] = "seq_0"
+    resultdict['jobname'] = jobname
+    resultdict['outpathname'] = os.path.basename(outpathname)
+    resultdict['resultfile'] = os.path.basename(resultfile)
+    resultdict['tarball'] = os.path.basename(tarball)
+    resultdict['zipfile'] = os.path.basename(zipfile)
+    resultdict['submit_date'] = submit_date_str
+    resultdict['queuetime'] = queuetime
+    resultdict['runtime'] = runtime
+    resultdict['BASEURL'] = g_params['BASEURL']
+    resultdict['status'] = status
+    resultdict['color_status'] = color_status
+    resultdict['numseq'] = numseq
+    resultdict['query_seqfile'] = os.path.basename(query_seqfile)
+    resultdict['raw_query_seqfile'] = os.path.basename(raw_query_seqfile)
+    base_www_url = "http://" + request.META['HTTP_HOST']
+#   note that here one must add http:// in front of the url
+    resultdict['url_result'] = "%s/pred/result/%s"%(base_www_url, jobid)
+
+    sum_run_time = 0.0
+    average_run_time = float(g_params['AVERAGE_RUNTIME_PER_SEQ_IN_SEC'])  # default average_run_time
+    num_finished = 0
+    cntnewrun = 0
+    cntcached = 0
+    newrun_table_list = [] # this is used for calculating the remaining time
+# get seqid_index_map
+    if os.path.exists(finished_seq_file):
+        resultdict['index_table_header'] = ["No.", "Length", "LOC_DEF", "LOC_DEF_SCORE",
+                "RunTime(s)", "SequenceName", "Source", "FinishDate" ]
+        index_table_content_list = []
+        indexmap_content = myfunc.ReadFile(finished_seq_file).split("\n")
+        cnt = 0
+        for line in indexmap_content:
+            strs = line.split("\t")
+            if len(strs)>=7:
+                subfolder = strs[0]
+                length_str = strs[1]
+                loc_def_str = strs[2]
+                loc_def_score_str = strs[3]
+                source = strs[4]
+                try:
+                    finishdate = strs[7]
+                except IndexError:
+                    finishdate = "N/A"
+
+                try:
+                    runtime_in_sec_str = "%.1f"%(float(strs[5]))
+                    if source == "newrun":
+                        sum_run_time += float(strs[5])
+                        cntnewrun += 1
+                    elif source == "cached":
+                        cntcached += 1
+                except:
+                    runtime_in_sec_str = ""
+                desp = strs[6]
+                rank = "%d"%(cnt+1)
+                if cnt < g_params['MAX_ROWS_TO_SHOW_IN_TABLE']:
+                    index_table_content_list.append([rank, length_str, loc_def_str,
+                        loc_def_score_str, runtime_in_sec_str, desp[:30], subfolder, source, finishdate])
+                if source == "newrun":
+                    newrun_table_list.append([rank, subfolder])
+                cnt += 1
+        if cntnewrun > 0:
+            average_run_time = sum_run_time / float(cntnewrun)
+
+        resultdict['index_table_content_list'] = index_table_content_list
+        resultdict['indexfiletype'] = "finishedfile"
+        resultdict['num_finished'] = cnt
+        num_finished = cnt
+        resultdict['percent_finished'] = "%.1f"%(float(cnt)/numseq*100)
+    else:
+        resultdict['index_table_header'] = []
+        resultdict['index_table_content_list'] = []
+        resultdict['indexfiletype'] = "finishedfile"
+        resultdict['num_finished'] = 0
+        resultdict['percent_finished'] = "%.1f"%(0.0)
+
+    num_remain = numseq - num_finished
+    time_remain_in_sec = num_remain * average_run_time # set default value
+
+    # re-define runtime as the sum of all real running time 
+    if sum_run_time > 0.0:
+        resultdict['runtime'] = myfunc.second_to_human(int(sum_run_time+0.5))
+
+    resultdict['num_row_result_table'] = len(resultdict['index_table_content_list'])
+
+    # calculate the remaining time based on the average_runtime of the last x
+    # number of newrun sequences
+
+    avg_newrun_time = webcom.GetAverageNewRunTime(finished_seq_file, window=10)
+
+    if cntnewrun > 0 and avg_newrun_time >= 0:
+        time_remain_in_sec = int(avg_newrun_time*num_remain+0.5)
+
+    time_remain = myfunc.second_to_human(int(time_remain_in_sec+0.5))
+    resultdict['time_remain'] = time_remain
+    qdinittagfile = "%s/runjob.qdinit"%(rstdir)
+
+    if os.path.exists(rstdir):
+        resultdict['isResultFolderExist'] = True
+    else:
+        resultdict['isResultFolderExist'] = False
+
+    if numseq <= 1:
+        resultdict['refresh_interval'] = webcom.GetRefreshInterval(
+                queuetime_in_sec, runtime_in_sec, method_submission)
+    else:
+        if os.path.exists(qdinittagfile):
+            addtime = int(math.sqrt(max(0,min(num_remain, num_finished))))+1
+            resultdict['refresh_interval'] = average_run_time + addtime
+        else:
+            resultdict['refresh_interval'] = webcom.GetRefreshInterval(
+                    queuetime_in_sec, runtime_in_sec, method_submission)
+
+    # get stat info
+    if os.path.exists(statfile):#{{{
+        content = myfunc.ReadFile(statfile)
+        lines = content.split("\n")
+        for line in lines:
+            strs = line.split()
+            if len(strs) >= 2:
+                resultdict[strs[0]] = strs[1]
+                percent =  "%.1f"%(int(strs[1])/float(numseq)*100)
+                newkey = strs[0].replace('num_', 'per_')
+                resultdict[newkey] = percent
+#}}}
+    resultdict['MAX_ROWS_TO_SHOW_IN_TABLE'] = g_params['MAX_ROWS_TO_SHOW_IN_TABLE']
+    resultdict['jobcounter'] = webcom.GetJobCounter(resultdict)
+    return render(request, 'pred/get_results.html', resultdict)
+#}}}
+def get_results_eachseq(request, jobid="1", seqindex="1"):#{{{
+    resultdict = {}
+    webcom.set_basic_config(request, resultdict, g_params)
+
+    rstdir = "%s/%s"%(path_result, jobid)
+    outpathname = jobid
+
+    jobinfofile = "%s/jobinfo"%(rstdir)
+    jobinfo = myfunc.ReadFile(jobinfofile).strip()
+    jobinfolist = jobinfo.split("\t")
+    if len(jobinfolist) >= 8:
+        submit_date_str = jobinfolist[0]
+        numseq = int(jobinfolist[3])
+        jobname = jobinfolist[5]
+        email = jobinfolist[6]
+        method_submission = jobinfolist[7]
+    else:
+        submit_date_str = ""
+        numseq = 1
+        jobname = ""
+        email = ""
+        method_submission = "web"
+
+    status = ""
+
+    resultdict['jobid'] = jobid
+    resultdict['subdirname'] = seqindex
+    resultdict['jobname'] = jobname
+    resultdict['outpathname'] = os.path.basename(outpathname)
+    resultdict['BASEURL'] = g_params['BASEURL']
+    resultdict['status'] = status
+    resultdict['numseq'] = numseq
+    base_www_url = "http://" + request.META['HTTP_HOST']
+
+    resultfile = "%s/%s/%s/%s"%(rstdir, outpathname, seqindex, "query.result.txt")
+    htmlfigure_file =  "%s/%s/%s/plot/%s"%(rstdir, outpathname, seqindex, "query_0.html")
+    if os.path.exists(htmlfigure_file):
+        resultdict['htmlfigure'] = "%s/%s/%s/%s/plot/%s"%(
+                "result", jobid, jobid, seqindex,
+                os.path.basename(htmlfigure_file))
+    else:
+        resultdict['htmlfigure'] = ""
+
+    if os.path.exists(rstdir):
+        resultdict['isResultFolderExist'] = True
+    else:
+        resultdict['isResultFolderExist'] = False
+
+
+    if os.path.exists(resultfile):
+        resultdict['resultfile'] = os.path.basename(resultfile)
+    else:
+        resultdict['resultfile'] = ""
+
+    resultdict['jobcounter'] = webcom.GetJobCounter(resultdict)
+    return render(request, 'pred/get_results_eachseq.html', resultdict)
+#}}}
+
 # enabling wsdl service
 
 #{{{ The actual wsdl api
