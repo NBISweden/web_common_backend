@@ -63,7 +63,7 @@ def RunCmd(cmd, logfile, errfile, verbose=False):# {{{
             myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  logfile, "a", True)
             myfunc.WriteFile("%s\n"%(rmsg),  logfile, "a", True)
         isCmdSuccess = True
-    except subprocess.CalledProcessError, e:
+    except subprocess.CalledProcessError as e:
         msg = "cmdline: %s\nFailed with message \"%s\""%(cmdline, str(e))
         myfunc.WriteFile("[%s] %s\n"%(date_str, msg),  errfile, "a", True)
         myfunc.WriteFile("%s\n"%(rmsg),  errfile, "a", True)
@@ -100,11 +100,11 @@ def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
             fpstat = open(statfile, "w")
 
         date_str = time.strftime(FORMAT_DATETIME)
-        print >> fpout, "##############################################################################"
-        print >> fpout, "Subcons result file"
-        print >> fpout, "Generated from %s at %s"%(base_www_url, date_str)
-        print >> fpout, "Total request time: %.1f seconds."%(runtime_in_sec)
-        print >> fpout, "##############################################################################"
+        print("##############################################################################", file=fpout)
+        print("Subcons result file", file=fpout)
+        print("Generated from %s at %s"%(base_www_url, date_str), file=fpout)
+        print("Total request time: %.1f seconds."%(runtime_in_sec), file=fpout)
+        print("##############################################################################", file=fpout)
         cnt = 0
         for line in maplist:
             strs = line.split('\t')
@@ -113,10 +113,10 @@ def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
             desp = strs[2]
             seq = strs[3]
             seqid = myfunc.GetSeqIDFromAnnotation(desp)
-            print >> fpout, "Sequence number: %d"%(cnt+1)
-            print >> fpout, "Sequence name: %s"%(desp)
-            print >> fpout, "Sequence length: %d aa."%(length)
-            print >> fpout, "Sequence:\n%s\n\n"%(seq)
+            print("Sequence number: %d"%(cnt+1), file=fpout)
+            print("Sequence name: %s"%(desp), file=fpout)
+            print("Sequence length: %d aa."%(length), file=fpout)
+            print("Sequence:\n%s\n\n"%(seq), file=fpout)
 
             rstfile1 = "%s/%s/%s/query_0_final.csv"%(outpath_result, subfoldername, "plot")
             rstfile2 = "%s/%s/query_0_final.csv"%(outpath_result, subfoldername)
@@ -137,7 +137,7 @@ def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
                         header_line = [x.strip() for x in header_line]
 
                     data_line = []
-                    for i in xrange(1, len(lines)):
+                    for i in range(1, len(lines)):
                         strs1 = lines[i].split("\t")
                         strs1 = [x.strip() for x in strs1]
                         data_line.append(strs1)
@@ -148,13 +148,13 @@ def WriteSubconsTextResultFile(outfile, outpath_result, maplist,#{{{
             if content == "":
                 content = "***No prediction could be produced with this method***"
 
-            print >> fpout, "Prediction results:\n\n%s\n\n"%(content)
+            print("Prediction results:\n\n%s\n\n"%(content), file=fpout)
 
-            print >> fpout, "##############################################################################"
+            print("##############################################################################", file=fpout)
             cnt += 1
 
     except IOError:
-        print "Failed to write to file %s"%(outfile)
+        print("Failed to write to file %s"%(outfile))
 #}}}
 def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
         runtime_in_sec, base_www_url, statfile=""):
@@ -175,11 +175,11 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
             fpstat = open(statfile, "w")
 
         date_str = time.strftime(FORMAT_DATETIME)
-        print >> fpout, "##############################################################################"
-        print >> fpout, "TOPCONS2 result file"
-        print >> fpout, "Generated from %s at %s"%(base_www_url, date_str)
-        print >> fpout, "Total request time: %.1f seconds."%(runtime_in_sec)
-        print >> fpout, "##############################################################################"
+        print("##############################################################################", file=fpout)
+        print("TOPCONS2 result file", file=fpout)
+        print("Generated from %s at %s"%(base_www_url, date_str), file=fpout)
+        print("Total request time: %.1f seconds."%(runtime_in_sec), file=fpout)
+        print("##############################################################################", file=fpout)
         cnt = 0
         for line in maplist:
             strs = line.split('\t')
@@ -187,10 +187,10 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
             length = int(strs[1])
             desp = strs[2]
             seq = strs[3]
-            print >> fpout, "Sequence number: %d"%(cnt+1)
-            print >> fpout, "Sequence name: %s"%(desp)
-            print >> fpout, "Sequence length: %d aa."%(length)
-            print >> fpout, "Sequence:\n%s\n\n"%(seq)
+            print("Sequence number: %d"%(cnt+1), file=fpout)
+            print("Sequence name: %s"%(desp), file=fpout)
+            print("Sequence length: %d aa."%(length), file=fpout)
+            print("Sequence:\n%s\n\n"%(seq), file=fpout)
 
             is_TM_cons = False
             is_TM_any = False
@@ -199,7 +199,7 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
             is_SP_cons = False
             is_SP_any = False
 
-            for i in xrange(len(methodlist)):
+            for i in range(len(methodlist)):
                 method = methodlist[i]
                 seqid = ""
                 seqanno = ""
@@ -236,9 +236,9 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
                     showtext_homo = method
                     if seqid != "":
                         showtext_homo = seqid
-                    print >> fpout, "%s:\n%s\n\n"%(showtext_homo, top)
+                    print("%s:\n%s\n\n"%(showtext_homo, top), file=fpout)
                 else:
-                    print >> fpout, "%s predicted topology:\n%s\n\n"%(method, top)
+                    print("%s predicted topology:\n%s\n\n"%(method, top), file=fpout)
 
 
             if fpstat:
@@ -259,19 +259,19 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
                 if line and line[0].isdigit():
                     dglines.append(line)
             if len(dglines)>0:
-                print >> fpout,  "\nPredicted Delta-G-values (kcal/mol) "\
-                        "(left column=sequence position; right column=Delta-G)\n"
-                print >> fpout, "\n".join(dglines)
+                print("\nPredicted Delta-G-values (kcal/mol) "\
+                        "(left column=sequence position; right column=Delta-G)\n", file=fpout)
+                print("\n".join(dglines), file=fpout)
 
             reliability_file = "%s/%s/Topcons/reliability.txt"%(outpath_result, subfoldername)
             reliability = ""
             if os.path.exists(reliability_file):
                 reliability = myfunc.ReadFile(reliability_file)
             if reliability != "":
-                print >> fpout, "\nPredicted TOPCONS reliability (left "\
-                        "column=sequence position; right column=reliability)\n"
-                print >> fpout, reliability
-            print >> fpout, "##############################################################################"
+                print("\nPredicted TOPCONS reliability (left "\
+                        "column=sequence position; right column=reliability)\n", file=fpout)
+                print(reliability, file=fpout)
+            print("##############################################################################", file=fpout)
             cnt += 1
 
         fpout.close()
@@ -294,7 +294,7 @@ def WriteTOPCONSTextResultFile(outfile, outpath_result, maplist,#{{{
         finishtagfile = "%s/%s"%(rstdir, "write_result_finish.tag")
         WriteDateTimeTagFile(finishtagfile, runjob_logfile, runjob_errfile)
     except IOError:
-        print "Failed to write to file %s"%(outfile)
+        print("Failed to write to file %s"%(outfile))
 #}}}
 def WriteProQ3TextResultFile(outfile, query_para, modelFileList, #{{{
         runtime_in_sec, base_www_url, proq3opt, statfile=""):
@@ -325,19 +325,19 @@ def WriteProQ3TextResultFile(outfile, query_para, modelFileList, #{{{
         numModel = len(modelFileList)
 
         date_str = time.strftime(FORMAT_DATETIME)
-        print >> fpout, "##############################################################################"
-        print >> fpout, "# ProQ3 result file"
-        print >> fpout, "# Generated from %s at %s"%(base_www_url, date_str)
-        print >> fpout, "# Options for Proq3: %s"%(str(proq3opt))
-        print >> fpout, "# Total request time: %.1f seconds."%(runtime_in_sec)
-        print >> fpout, "# Number of finished models: %d"%(numModel)
-        print >> fpout, "##############################################################################"
-        print >> fpout
-        print >> fpout, "# Global scores"
+        print("##############################################################################", file=fpout)
+        print("# ProQ3 result file", file=fpout)
+        print("# Generated from %s at %s"%(base_www_url, date_str), file=fpout)
+        print("# Options for Proq3: %s"%(str(proq3opt)), file=fpout)
+        print("# Total request time: %.1f seconds."%(runtime_in_sec), file=fpout)
+        print("# Number of finished models: %d"%(numModel), file=fpout)
+        print("##############################################################################", file=fpout)
+        print(file=fpout)
+        print("# Global scores", file=fpout)
         fpout.write("# %10s"%("Model"))
 
         cnt = 0
-        for i  in xrange(numModel):
+        for i  in range(numModel):
             modelfile = modelFileList[i]
             globalscorefile = "%s.%s.%s.global"%(modelfile, m_str, method_quality)
             if not os.path.exists(globalscorefile):
@@ -353,26 +353,26 @@ def WriteProQ3TextResultFile(outfile, query_para, modelFileList, #{{{
             try:
                 if globalscore:
                     fpout.write("%2s %10s"%("", "model_%d"%(i)))
-                    for jj in xrange(len(itemList)):
+                    for jj in range(len(itemList)):
                         fpout.write(" %12f"%(globalscore[itemList[jj]]))
                     fpout.write("\n")
                 else:
-                    print >> fpout, "%2s %10s"%("", "model_%d"%(i))
+                    print("%2s %10s"%("", "model_%d"%(i)), file=fpout)
             except:
                 pass
 
-        print >> fpout, "\n# Local scores"
-        for i  in xrange(numModel):
+        print("\n# Local scores", file=fpout)
+        for i  in range(numModel):
             modelfile = modelFileList[i]
             localscorefile = "%s.%s.%s.local"%(modelfile, m_str, method_quality)
             if not os.path.exists(localscorefile):
                 localscorefile = "%s.proq3.local"%(modelfile)
-            print >> fpout, "\n# Model %d"%(i)
+            print("\n# Model %d"%(i), file=fpout)
             content = myfunc.ReadFile(localscorefile)
-            print >> fpout, content
+            print(content, file=fpout)
 
     except IOError:
-        print "Failed to write to file %s"%(outfile)
+        print("Failed to write to file %s"%(outfile))
 #}}}
 def WriteBoctopusTextResultFile(outfile, outpath_result, maplist, runtime_in_sec, base_www_url, statfile=""):#{{{
     rstdir = os.path.realpath("%s/.."%(outpath_result))
@@ -464,7 +464,7 @@ def GetLocDef(predfile):#{{{
                 if strs0[1] == "LOC_DEF":
                     loc_def = strs1[1]
                     dt_score = {}
-                    for i in xrange(2, len(strs0)):
+                    for i in range(2, len(strs0)):
                         dt_score[strs0[i]] = strs1[i]
                     if loc_def in dt_score:
                         loc_def_score = dt_score[loc_def]
@@ -512,7 +512,7 @@ def ReadProQ3GlobalScore(infile):#{{{
                 except:
                     values = []
         if len(keys) == len(values):
-            for i in xrange(len(keys)):
+            for i in range(len(keys)):
                 globalscore[keys[i]] = values[i]
     except IOError:
         pass
@@ -696,7 +696,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
 # checking for bad sequences in the query
 
     if seqinfo['isValidSeq']:
-        for i in xrange(numseq):
+        for i in range(numseq):
             seq = seqRecordList[i][2].strip()
             anno = seqRecordList[i][1].strip().replace('\t', ' ')
             seqid = seqRecordList[i][0].strip()
@@ -704,7 +704,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
             seq = re.sub("[\s\n\r\t]", '', seq)
             li1 = [m.start() for m in re.finditer("[^ABCDEFGHIKLMNPQRSTUVWYZX*-]", seq)]
             if len(li1) > 0:
-                for j in xrange(len(li1)):
+                for j in range(len(li1)):
                     msg = "Bad letter for amino acid in sequence %s (SeqNo. %d) "\
                             "at position %d (letter: '%s')"%(seqid, i+1,
                                     li1[j]+1, seq[li1[j]])
@@ -723,7 +723,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
 #    *, - will be deleted
     if seqinfo['isValidSeq']:
         li_newseq = []
-        for i in xrange(numseq):
+        for i in range(numseq):
             seq = seqRecordList[i][2].strip()
             anno = seqRecordList[i][1].strip()
             seqid = seqRecordList[i][0].strip()
@@ -734,7 +734,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
 
             li1 = [m.start() for m in re.finditer("[BZ]", seq)]
             if len(li1) > 0:
-                for j in xrange(len(li1)):
+                for j in range(len(li1)):
                     msg = "Amino acid in sequence %s (SeqNo. %d) at position %d "\
                             "(letter: '%s') has been replaced by 'X'"%(seqid,
                                     i+1, li1[j]+1, seq[li1[j]])
@@ -743,7 +743,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
 
             li1 = [m.start() for m in re.finditer("[U]", seq)]
             if len(li1) > 0:
-                for j in xrange(len(li1)):
+                for j in range(len(li1)):
                     msg = "Amino acid in sequence %s (SeqNo. %d) at position %d "\
                             "(letter: '%s') has been replaced by 'C'"%(seqid,
                                     i+1, li1[j]+1, seq[li1[j]])
@@ -752,7 +752,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
 
             li1 = [m.start() for m in re.finditer("[*]", seq)]
             if len(li1) > 0:
-                for j in xrange(len(li1)):
+                for j in range(len(li1)):
                     msg = "Translational stop in sequence %s (SeqNo. %d) at position %d "\
                             "(letter: '%s') has been deleted"%(seqid,
                                     i+1, li1[j]+1, seq[li1[j]])
@@ -761,7 +761,7 @@ def ValidateSeq(rawseq, seqinfo, g_params):#{{{
 
             li1 = [m.start() for m in re.finditer("[-]", seq)]
             if len(li1) > 0:
-                for j in xrange(len(li1)):
+                for j in range(len(li1)):
                     msg = "Gap in sequence %s (SeqNo. %d) at position %d "\
                             "(letter: '%s') has been deleted"%(seqid,
                                     i+1, li1[j]+1, seq[li1[j]])

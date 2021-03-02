@@ -3,13 +3,12 @@
 # Description: submit job to queue
 import os
 import sys
-import myfunc
 import subprocess
 import time
 import math
-import webserver_common as webcom
 import json
-suq_exec = "/usr/bin/suq"
+from libpredweb import myfunc
+from libpredweb import webserver_common as webcom
 progname =  os.path.basename(__file__)
 wspace = ''.join([" "]*len(progname))
 
@@ -20,12 +19,9 @@ vip_email_file = "%s/config/vip_email.txt"%(basedir)
 
 rundir = os.path.dirname(os.path.realpath(__file__))
 basedir = os.path.realpath("%s/../"%(rundir))
-python_exec = os.path.realpath("%s/../../env/bin/python"%(basedir))
+python_exec = "python"
+suq_exec = "/usr/bin/suq"
 suq_basedir = "/tmp"
-# if os.path.exists("/scratch"):
-#     suq_basedir = "/scratch"
-# elif os.path.exists("/tmp"):
-#     suq_basedir = "/tmp"
 gen_errfile = "%s/static/log/%s.log"%(basedir, progname)
 
 
@@ -58,9 +54,9 @@ Examples:
 """%(progname)
 
 def PrintHelp(fpout=sys.stdout):#{{{
-    print >> fpout, usage_short
-    print >> fpout, usage_ext
-    print >> fpout, usage_exp#}}}
+    print(usage_short, file=fpout)
+    print(usage_ext, file=fpout)
+    print(usage_exp, file=fpout)#}}}
 
 def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, #{{{
         host_ip, base_www_url):
@@ -104,7 +100,7 @@ def SubmitJobToQueue(jobid, datapath, outpath, numseq, numseq_this_user, email, 
     webcom.loginfo(msg, g_params['debugfile'])
 
     myfunc.WriteFile(code, scriptfile, mode="w", isFlush=True)
-    os.chmod(scriptfile, 0755)
+    os.chmod(scriptfile, 0o755)
 
     webcom.loginfo("Getting priority", g_params['debugfile'])
     priority = myfunc.GetSuqPriority(numseq_this_user)
@@ -243,9 +239,9 @@ def main(g_params):#{{{
         cmd =  ["mkdir", "-p", outpath]
         try:
             rmsg = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, e:
-            print e
-            print rmsg
+        except subprocess.CalledProcessError as e:
+            print(e)
+            print(rmsg)
             return 1
 
     if jobid == "":
