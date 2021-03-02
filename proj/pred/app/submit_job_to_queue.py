@@ -3,13 +3,12 @@
 # Description: submit job to queue
 import os
 import sys
-import myfunc
 import subprocess
 import time
 import math
-import webserver_common as webcom
 import json
-suq_exec = "/usr/bin/suq"
+from libpredweb import myfunc
+from libpredweb import webserver_common as webcom
 progname =  os.path.basename(__file__)
 wspace = ''.join([" "]*len(progname))
 
@@ -20,12 +19,9 @@ vip_email_file = "%s/config/vip_email.txt"%(basedir)
 
 rundir = os.path.dirname(os.path.realpath(__file__))
 basedir = os.path.realpath("%s/../"%(rundir))
-python_exec = os.path.realpath("%s/../../env/bin/python"%(basedir))
+python_exec = "python"
+suq_exec = "/usr/bin/suq"
 suq_basedir = "/tmp"
-# if os.path.exists("/scratch"):
-#     suq_basedir = "/scratch"
-# elif os.path.exists("/tmp"):
-#     suq_basedir = "/tmp"
 gen_errfile = "%s/static/log/%s.log"%(basedir, progname)
 
 
