@@ -216,6 +216,14 @@ def GetCommand(name_software, seqfile_this_seq, tmp_outpath_result, tmp_outpath_
                     docker_tmp_outpath_result, docker_seqfile_this_seq, 
                     docker_variant_file, docker_tmp_outpath_this_seq, identifier_name)]
 
+    elif name_software in ['docker_predzinc']:
+        containerID = 'predzinc'
+        cmd =  ["/usr/bin/docker", "exec", "--user", "user", containerID, 
+                "script", "/dev/null", "-c", 
+                "cd %s; export HOME=/home/user; /app/predzinc/predzinc.sh --cpu 4 %s -outpath %s"%(
+                    docker_tmp_outpath_result, docker_seqfile_this_seq,
+                    docker_tmp_outpath_this_seq)]
+
     elif name_software in ['prodres']:#{{{
         runscript = "%s/%s"%(rundir, "soft/PRODRES/PRODRES/PRODRES.py")
         path_pfamscan = "%s/misc/PfamScan"%(webserver_root)
