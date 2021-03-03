@@ -136,7 +136,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 SUPER_USER_LIST = ["admin","nanjiang", "njshu"]
 
-ALLOWED_HOSTS = ['localhost', 'dev.commonbackend.*', 'commonbackend.*', 'commonbackend.computenode.pcons3.se', 'commonbackend.computenode.shu.se']
+ALLOWED_HOSTS = ['localhost', 'dev.commonbackend.*', 'commonbackend.*', 'commonbackend.computenode.pcons3.se','commonbackend.computenode.devpcons3.se', 'commonbackend.computenode.shu.se']
 
 computenodefile = "%s/pred/config/computenode.txt"%(BASE_DIR)
 if os.path.exists(computenodefile):
