@@ -65,3 +65,17 @@ services:
         restart: always
         stdin_open: true
         tty: true
+
+    predzinc:
+        image: nanjiang/predzinc
+        container_name: predzinc
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - ${DATA_DIR}:/data
+            - ${DATA_DIR}/db_predzinc:/app/predzinc/data
+            - ${SCRATCH_DIR}:/scratch
+            - ${WEB_STATIC}:/static
+        restart: always
+        stdin_open: true
+        tty: true
