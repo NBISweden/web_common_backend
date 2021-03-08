@@ -10,6 +10,7 @@
 
 # backup folder
 bak/
+*.bak
 result/
 tmp/
 log/
@@ -17,6 +18,8 @@ md5/
 env/
 bak.env/
 proj/settings.py
+proj/pred/app/formatdb.log
+proj/pred/app/logs/
 
 .env
 
