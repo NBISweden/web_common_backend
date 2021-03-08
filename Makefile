@@ -24,17 +24,17 @@ init:
 	@echo "USER_ID=$(USER_ID)" >> .env
 
 
-up: .env docker-compose.yml
-	@docker-compose up -d $(XARGS)
+up: .env docker-compose-apps.yml
+	@docker-compose -f docker-compose-apps.yml up -d $(XARGS)
 
 down: #.env
-	@docker-compose down -v
+	@docker-compose -f docker-compose-apps.yml down -v
 
 clean:
 	rm -f .env
 
 ps:
-	@docker-compose ps
+	@docker-compose -f docker-compose-apps.yml ps
 
 clean-all: clean clean-volumes
 
