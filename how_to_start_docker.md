@@ -27,6 +27,15 @@
 ## for apache server
     docker run -e USER_ID=$(id -u apache) -v /big/data:/data -v /big/data/db_predzinc:/app/predzinc/data -v /scratch:/scratch -v /var/www/html/common_backend/proj/pred/static/:/static  --restart=always -it --name predzinc  -d nanjiang/predzinc
 
+# frag1d
+
+## for regular user
+
+    docker run  -e USER_ID=$(id -u $USER) -v /data:/data -v /data/db_frag1d:/app/frag1d/data -v /scratch:/scratch --rm --name t_frag1d  -it -d nanjiang/frag1d
+
+## for apache server
+    docker run -e USER_ID=$(id -u apache) -v /big/data:/data -v /big/data/db_frag1d:/app/frag1d/data -v /scratch:/scratch -v /var/www/html/common_backend/proj/pred/static/:/static  --restart=always -it --name frag1d  -d nanjiang/frag1d
+
 ---
 
 # Using docker-compose to start containers for web-server use
