@@ -79,3 +79,17 @@ services:
         restart: always
         stdin_open: true
         tty: true
+
+    frag1d:
+        image: nanjiang/frag1d
+        container_name: frag1d
+        environment:
+            - USER_ID=${USER_ID}
+        volumes:
+            - ${DATA_DIR}:/data
+            - ${DATA_DIR}/db_frag1d:/app/frag1d/data
+            - ${SCRATCH_DIR}:/scratch
+            - ${WEB_STATIC}:/static
+        restart: always
+        stdin_open: true
+        tty: true
